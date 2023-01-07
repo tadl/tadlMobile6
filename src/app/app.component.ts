@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { User } from './user';
+import { Storage } from '@ionic/storage-angular';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -16,5 +18,13 @@ export class AppComponent {
   ];
 /*  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders']; */
 
-  constructor() {}
+  constructor(
+    public user: User,
+    private storage: Storage,
+  ) {}
+
+ ngOnInit() {
+    this.storage.create();
+    this.user.autolog();
+  }
 }
