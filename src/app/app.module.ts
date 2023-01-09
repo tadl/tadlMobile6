@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
+import { Globals } from './globals';
 import { User } from './user';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
+    Globals,
     User,
   ],
   bootstrap: [AppComponent],

@@ -3,6 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+    <ion-progress-bar *ngIf="globals.api_loading" type="indeterminate"></ion-progress-bar>
     <ion-title>TADL Mobile</ion-title>
     <ion-buttons slot="end">
       <ion-menu-button menu="end"><ion-icon name="person-circle"></ion-icon></ion-menu-button>

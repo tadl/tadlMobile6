@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Globals } from './globals';
 import { User } from './user';
 import { Storage } from '@ionic/storage-angular';
 @Component({
@@ -16,9 +17,9 @@ export class AppComponent {
     { title: 'Featured', url: '/featured', icon: 'star' },
     { title: 'About', url: '/about', icon: 'phone-portrait' },
   ];
-/*  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders']; */
 
   constructor(
+    public globals: Globals,
     public user: User,
     private storage: Storage,
   ) {}
