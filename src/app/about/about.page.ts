@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Globals } from '../globals';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -9,7 +10,10 @@ import { ActivatedRoute } from '@angular/router';
 export class AboutPage implements OnInit {
   public about: string | null;
 
-  constructor(private activatedRoute: ActivatedRoute) { }
+  constructor(
+    public globals: Globals,
+    private activatedRoute: ActivatedRoute
+  ) { }
 
   ngOnInit() {
     this.about = this.activatedRoute.snapshot.paramMap.get('id')

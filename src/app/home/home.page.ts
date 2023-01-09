@@ -1,5 +1,5 @@
-import { Globals } from '../globals';
 import { Component, OnInit } from '@angular/core';
+import { Globals } from '../globals';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
