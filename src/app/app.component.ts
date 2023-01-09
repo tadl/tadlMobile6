@@ -1,13 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { IonModal } from '@ionic/angular';
 import { Globals } from './globals';
 import { User } from './user';
 import { Storage } from '@ionic/storage-angular';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+  @ViewChild(IonModal) modal: IonModal;
+  card_modal = false;
+
+  show_card(isOpen: boolean) {
+    this.card_modal = isOpen;
+  }
+
   public appPages = [
     { title: 'Home', url: '/home', icon: 'home' },
     { title: 'Search', url: '/search', icon: 'search' },
@@ -28,4 +37,5 @@ export class AppComponent {
     this.storage.create();
     this.user.autolog();
   }
+
 }

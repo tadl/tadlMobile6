@@ -23,7 +23,6 @@ export class User {
   card: string;
   token: string;
   default_pickup: string;
-  melcat_id: string;
   id: string;
   fines: any;
   action_retry: any;
@@ -160,7 +159,6 @@ export class User {
       this.card = '';
       this.overdue = '';
       this.id = '';
-      this.melcat_id = '';
       this.fines_exist = false;
       this.default_pickup = '';
       this.preferences = {};

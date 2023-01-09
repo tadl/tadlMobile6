@@ -10,6 +10,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { Drivers, Storage } from '@ionic/storage';
 import { IonicStorageModule } from '@ionic/storage-angular';
+import { NgxBarcodeModule } from 'ngx-barcode';
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,6 +20,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+    NgxBarcodeModule,
     IonicStorageModule.forRoot({
       name: '__db',
       driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
