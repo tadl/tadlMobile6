@@ -27,6 +27,7 @@
     "@ionic/angular": "^6.1.9",
     "@ionic/pwa-elements": "^3.1.1",
     "@ionic/storage-angular": "^3.0.6",
+    "date-fns": "^2.29.3",
     "ionicons": "^6.0.3",
     "ngx-barcode": "^0.3.0",
     "rxjs": "~7.5.0",

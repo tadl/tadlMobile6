@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Platform, ModalController, MenuController } from '@ionic/angular';
+import { format, parseISO } from 'date-fns';
 
 @Injectable()
 
@@ -70,17 +71,157 @@ export class Globals {
   public hours_locations_url: string = this.website_schema + this.website_host + '/locations.json';
   public pay_fines_url: string = this.website_schema + this.website_host + '/pay/pay.cgi'; /* redirected by nginx */
 
-
-
-
-
-
-
   /* global vars */
   public api_loading: boolean = false;
   public net_status: string = "online";
   public net_type: string = "undefined";
 
+  /* Arrays and Maps to handle multi-location things */
+  /* Used for changing pickup locations on holds */
+  public pickup_locations: Array<{name: string, code: string}> = [
+    { name: 'Traverse City', code: '23' },
+    { name: 'Interlochen', code: '24' },
+    { name: 'Kingsley', code: '25' },
+    { name: 'Peninsula', code: '26' },
+    { name: 'Fife Lake', code: '27' },
+    { name: 'East Bay', code: '28' },
+  ];
+
+  /* Used for searching */
+  public search_locations: Array<{name: string, code: string}> = [
+    { name: 'All Locations', code: '22' },
+    { name: 'Traverse City', code: '23' },
+    { name: 'Interlochen', code: '24' },
+    { name: 'Kingsley', code: '25' },
+    { name: 'Peninsula', code: '26' },
+    { name: 'Fife Lake', code: '27' },
+    { name: 'East Bay', code: '28' },
+  ];
+
+  /* Used for displaying location name on item details */
+  public short_to_friendly_name = new Map<string, string>([
+    ['TADL-EBB', 'East Bay'],
+    ['TADL-KBL', 'Kingsley'],
+    ['TADL-PCL', 'Peninsula'],
+    ['TADL-IPL', 'Interlochen'],
+    ['TADL-FLPL', 'Fife Lake'],
+    ['TADL-WOOD', 'Traverse City'],
+  ]);
+
+  /* Used for filtering events by location */
+  public event_venues: Array<{venue: number, name: string}> = [
+    { venue: 89, name: 'Traverse City' },
+    { venue: 132, name: 'East Bay' },
+    { venue: 133, name: 'Fife Lake' },
+    { venue: 134, name: 'Kingsley' },
+    { venue: 135, name: 'Interlochen' },
+    { venue: 136, name: 'Peninsula' },
+    { venue: 160, name: 'Online' },
+  ];
+
+  /* Formats */
+  public formats: string[] = [
+    'All Formats',
+    'Books',
+    'Books - Fiction',
+    'Books - Non-fiction',
+    'Large Print',
+    'Large Print - Fiction',
+    'Large Print - Non-fiction',
+    'Audiobooks',
+    'Audiobooks - Fiction',
+    'Audiobooks - Non-fiction',
+    'eBooks',
+    'eBooks - Fiction',
+    'eBooks - Non-fiction',
+    'Movies / TV',
+    'Music',
+    'Video Games',
+  ];
+
+  item_type = new Map<string, string>([
+    ['text', 'book'],
+    ['notated music', 'musical-notes'],
+    ['cartographic', 'map'],
+    ['moving image', 'film'],
+    ['sound recording-nonmusical', 'disc'],
+    ['sound recording-musical', 'disc'],
+    ['still image', 'image'],
+    ['software, multimedia', 'document'],
+    ['kit', 'briefcase'],
+    ['mixed-material', 'briefcase'],
+    ['three dimensional object', 'archive'],
+  ]);
+
+  /* Sort Options */
+  public sort_options: Array<string[]> = [
+    ['Relevance', 'relevance'],
+    ['Newest to Oldest', 'pubdateDESC'],
+    ['Oldest to Newest', 'pubdateASC'],
+    ['Title A to Z', 'titleAZ'],
+    ['Title Z to A', 'titleZA'],
+  ];
+
+  /* Audiences */
+  public audiences: Array<string> = [ "All", "Adult", "Young Adult", "Juvenile" ];
+
+  /* FUNctions */
+
+  /* date formatter */
+  format_date(str:string, fmt?:string) {
+    if (fmt == "event") {
+      return format(parseISO(str), 'EEE LLLL do, h:mm a');
+    } else if (fmt == "eventdetailday") {
+      return format(parseISO(str), 'EEEE');
+    } else if (fmt == "eventdetaildate") {
+      return format(parseISO(str), 'LLLL do');
+    } else if (fmt == "eventdetailtime") {
+      return format(parseISO(str), 'h:mm a');
+    } else if (fmt == "news") {
+      return format(parseISO(str), 'LLLL do, h:mm a');
+    } else return null;
+  }
+
+  /* returns today's day, for displaying hours today */
+  day_today() {
+    return format(new Date(), 'EEEE');
+  }
+
+  /* toggles for added content on item detail */
+  /* not yet
+  show_more(id:string, type:string) {
+    var div_to_hide = id + '-' + type;
+    var div_to_show = div_to_hide + '-full';
+    document.getElementById(div_to_show).setAttribute('style', 'display: block');
+    document.getElementById(div_to_hide).setAttribute('style', 'display: none');
+  }
+  show_less(id, type) {
+    var div_to_show = id + '-' + type
+    var div_to_hide = div_to_show + '-full'
+    document.getElementById(div_to_show).setAttribute("style", "display: block")
+    document.getElementById(div_to_hide).setAttribute("style", "display: none")
+  }
+  */
+
+  /* opens account menu */
+  open_account_menu() {
+    this.menuController.open('end');
+  }
+
+  /* closes modals */
+  async close_modal() {
+    const onClosedData: string = "Wrapped up!";
+    await this.modalController.dismiss(onClosedData);
+  }
+
+  /* image error */
+  /* not yet
+  image_error(event:Array<string[]>) {
+    event.target.src = this.square_logo_url;
+  }
+  */
+
+  /* api loading indicator */
   loading_show() {
     this.api_loading = true;
   }
