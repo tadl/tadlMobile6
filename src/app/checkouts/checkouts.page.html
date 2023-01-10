@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-buttons slot="start">
+    <ion-menu-button></ion-menu-button>
+  </ion-buttons>
+  <ion-toolbar>
+    <ion-progress-bar *ngIf="globals.api_loading" type="indeterminate"></ion-progress-bar>
+    <ion-title>Checked out items</ion-title>
+  </ion-toolbar>
+  <ion-buttons slot="end">
+    <ion-menu-button menu="end"><ion-icon name="person-circle"></ion-icon></ion-menu-button>
+  </ion-buttons>
+</ion-header>
+<ion-content>
+  <div *ngIf="user.checkouts.length > 0">
+    <ion-item-divider>
+      <ion-label>{{ user.checkouts.length }} Items</ion-label>
+      <ion-button slot="end" *ngIf="user.checkouts.length > 0">Renew All</ion-button>
+    </ion-item-divider>
+    <ion-item-sliding *ngFor="let checkout of user.checkouts">
+      <ion-item-options side="end">
+        <ion-item-option>Details</ion-item-option>
+        <ion-item-option *ngIf="checkout.renew_attempts > 0"  color="secondary">Renew</ion-item-option>
+      </ion-item-options>
+      <ion-item>
+        <ion-img slot="start" [src]="globals.catalog_covers_medium + checkout.id"></ion-img>
+        <ion-label>
+          <h2><ion-text color="danger" *ngIf="checkout.overdue">(OVERDUE) </ion-text><ion-text [innerHTML]="checkout.title"></ion-text></h2>
+          <ion-text>
+            <p *ngIf="checkout.author_brief" [innerHTML]="checkout.author_brief"></p>
+            <p>Copy number {{ checkout.barcode }}</p>
+            <p>Due {{ checkout.due_date}} ({{checkout.due_words}})</p>
+            <p><span *ngIf="checkout.renew_attempts <= 0">No </span><span *ngIf="checkout.renew_attempts > 0">{{ checkout.renew_attempts }} </span>Renewal<span *ngIf="(checkout.renew_attempts > 1) || (checkout.renew_attempts <= 0)">s</span> remaining</p>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+    </ion-item-sliding>
+  </div>
+  <div *ngIf="user.checkouts.length == 0 && user.checkout_count == '0'">
+    <p margin>Checkouts are loading. One moment.</p>
+  </div>
+  <div *ngIf="user.checkout_count == '0'">
+    <p margin>You have no items checked out.</p>
+  </div>
+</ion-content>

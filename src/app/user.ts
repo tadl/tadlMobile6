@@ -2,6 +2,7 @@ import { Globals } from './globals';
 import { Component, ViewChild, NgZone, Injectable } from '@angular/core';
 import { ModalController, ActionSheetController, AlertController, NavController, ToastController} from '@ionic/angular';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
 import { Storage } from '@ionic/storage-angular';
 
@@ -15,6 +16,7 @@ export class User {
   full_name: string;
   ils_username: string;
   checkout_count: string;
+  checkouts: Array<any> = [];
   holds_count: string;
   holds_ready_count: string;
   overdue: string;
@@ -27,6 +29,7 @@ export class User {
   fines: any;
   action_retry: any;
   preferences: any;
+  item:{};
 
   constructor(
     public toast: ToastController,
@@ -79,22 +82,20 @@ export class User {
   }
 
   async update_user_object(data : any={}) {
-    this.zone.run(() => {
-      this.logged_in = true;
-      this.token = data['token'];
-      this.full_name = data['full_name'];
-      this.checkout_count = data['checkouts'];
-      this.holds_count = data['holds'];
-      this.holds_ready_count = data['holds_ready'];
-      this.fines_amount = data['fine'];
-      this.id = data['melcat_id'];
-      if (parseFloat(this.fines_amount) != parseFloat('0.00')) { this.fines_exist = true; }
-      this.card = data['card'];
-      this.overdue = data['overdue'];
-      this.default_pickup = data['pickup_library'];
-      this.storage.set('username', this.username);
-      this.storage.set('hashed_password', this.hashed_password);
-    });
+    this.logged_in = true;
+    this.token = data['token'];
+    this.full_name = data['full_name'];
+    this.checkout_count = data['checkouts'];
+    this.holds_count = data['holds'];
+    this.holds_ready_count = data['holds_ready'];
+    this.fines_amount = data['fine'];
+    this.id = data['melcat_id'];
+    if (parseFloat(this.fines_amount) != parseFloat('0.00')) { this.fines_exist = true; }
+    this.card = data['card'];
+    this.overdue = data['overdue'];
+    this.default_pickup = data['pickup_library'];
+    this.storage.set('username', this.username);
+    this.storage.set('hashed_password', this.hashed_password);
   }
 
   async confirm_logout() {
@@ -145,26 +146,69 @@ export class User {
 
   clear_user(data : any={}) {
     console.log('trying to clear user...');
-    this.zone.run(() => {
-      this.logged_in = false;
-      this.username = '';
-      this.password = '';
-      this.hashed_password = '';
-      this.token = '';
-      this.full_name = '';
-      this.checkout_count = '';
-      this.holds_count = '';
-      this.holds_ready_count = '';
-      this.fines_amount = '';
-      this.card = '';
-      this.overdue = '';
-      this.id = '';
-      this.fines_exist = false;
-      this.default_pickup = '';
-      this.preferences = {};
-      this.fines = [];
-      this.storage.remove('hashed_password');
-      this.storage.remove('username');
-    });
+    this.logged_in = false;
+    this.username = '';
+    this.password = '';
+    this.hashed_password = '';
+    this.token = '';
+    this.full_name = '';
+    this.checkout_count = '';
+    this.holds_count = '';
+    this.holds_ready_count = '';
+    this.fines_amount = '';
+    this.card = '';
+    this.overdue = '';
+    this.id = '';
+    this.fines_exist = false;
+    this.default_pickup = '';
+    this.preferences = {};
+    this.fines = [];
+    this.storage.remove('hashed_password');
+    this.storage.remove('username');
   }
+
+  get_checkouts(){
+    if(this.logged_in){
+      console.log('trying to get checkouts...');
+      let params = new HttpParams()
+      .set("token", this.token)
+      .set("v", "5");
+      this.globals.loading_show();
+      this.http.get(this.globals.catalog_checkouts_url, {params: params})
+        .subscribe({
+          next: (response) => this.process_checkouts(response),
+          error: (error) => this.show_error_message("Could not reach server. Please verify you have a data connection or try again later."),
+        });
+    }
+  }
+
+  process_checkouts(data: any={}) {
+    this.globals.api_loading = false;
+    let date_today = format(new Date(), 'MM/dd/yyyy');
+    console.log(data)
+    this.update_user_object(data['user'])
+    data = data['checkouts']
+    data.forEach(function(checkout: any={} , index = 0) {
+      if (isBefore(new Date(checkout['due_date']), new Date(date_today)) && !isSameDay(new Date(checkout['due_date']), new Date(date_today))) {
+        data[index]['overdue'] = true;
+        data[index]['due_words'] = formatDistance(new Date(checkout['due_date']), new Date(date_today)) + ' ago';
+      } else {
+        data[index]['overdue'] = false;
+        if (isSameDay(new Date(checkout['due_date']), new Date(date_today))) {
+          data[index]['due_words'] = "today";
+        } else {
+          data[index]['due_words'] = 'in ' + formatDistance(new Date(checkout['due_date']), new Date(date_today));
+        }
+      }
+    });
+    let existing = this.checkouts.map(item => item['checkout_id'] + item['renew_attempts'] + item['due_date']).join();
+    let newdata = data.map((item: any) => item['checkout_id'] + item['renew_attempts'] + item['due_date']).join();
+    if (existing != newdata) {
+      this.zone.run(() => {
+        this.checkouts = data;
+      });
+    }
+  }
+
+
 }
