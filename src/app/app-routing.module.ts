@@ -39,6 +39,10 @@ const routes: Routes = [
     path: 'location-detail',
     loadChildren: () => import('./location-detail/location-detail.module').then( m => m.LocationDetailPageModule)
   },
+  {
+    path: 'checkouts',
+    loadChildren: () => import('./checkouts/checkouts.module').then( m => m.CheckoutsPageModule)
+  },
 ];
 
 @NgModule({
