@@ -19,6 +19,53 @@
   </ion-header>
 
   <div id="container">
+
+    <div *ngIf="!this.web_events" class="ion-text-center">
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+          <ion-icon name="calendar" class="heading"></ion-icon>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+          <ion-text>Loading Events...</ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <ion-list *ngIf="this.web_events">
+
+      <ion-item *ngIf="globals.multi_location == true">
+        <ion-label class="location-label">Location</ion-label>
+        <ion-select [(ngModel)]="location" interface="popover" (ionChange)="get_events(location)" class="location-select">
+        <ion-select-option value="">All Locations</ion-select-option>
+        <ion-select-option *ngFor="let venue of globals.event_venues" [value]="venue.venue">{{ venue.name }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngFor="let event of this.web_events" detail="true">
+        <ion-thumbnail slot="start" *ngIf="event.image">
+          <ion-img [src]="event.image"></ion-img>
+        </ion-thumbnail>
+        <ion-thumbnail slot="start" *ngIf="!event.image">
+        </ion-thumbnail>
+        <ion-label>
+          <ion-text>
+            <h2 [innerHTML]="event.title"></h2>
+          </ion-text>
+          <ion-text>
+            <p [innerHTML]="globals.format_date(event.start_date, 'event')"></p>
+          </ion-text>
+          <ion-text color="medium" *ngIf="event.branch">
+            <p>{{event.branchname}}</p>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+
   </div>
 
 </ion-content>
