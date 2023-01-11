@@ -21,6 +21,7 @@ export class Globals {
   public catalog_host: string = 'apiv4.catalog.tadl.org'; /* hostname for catalog api */
   public catalog_covers_host: string = 'catalog.tadl.org'; /* hostname for catalog extras */
   public website_host: string = 'www.tadl.org'; /* hostname for website */
+  public tools_host: string = 'tools.app.tadl.org'; /* hostname for tools TODO: UPDATE */
   public system_short_name: string = 'TADL';
   public all_locations_value: string = '22';
 
@@ -68,7 +69,9 @@ export class Globals {
   public website_schema: string = 'https://';
   public events_api_url: string = this.website_schema + this.website_host + '/events/feed/json';
 
-  public hours_locations_url: string = this.website_schema + this.website_host + '/locations.json';
+  public news_api_url: string = this.website_schema + this.tools_host + '/posts';
+
+  public hours_locations_url: string = this.website_schema + this.tools_host + '/locations.json?group=tadl';
   public pay_fines_url: string = this.website_schema + this.website_host + '/pay/pay.cgi'; /* redirected by nginx */
 
   /* global vars */

@@ -16,7 +16,7 @@ import { LocationDetailPage } from '../location-detail/location-detail.page';
 export class LocationsPage implements OnInit {
 
 /*  url: string = this.globals.hours_locations_url; */
-  url: string = 'https://tools.app.tadl.org/locations.json?group=tadl';
+  url: string = this.globals.hours_locations_url;
   locations: any = [];
   subscription: any;
   offline_updated: any;
