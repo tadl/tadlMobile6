@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Location Detail</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="globals.close_modal()" class="button button-clear">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="location-detail">
+    <img [src]="location.image">
+    <h2 text-center [innerHTML]="location.fullname"></h2>
+    <div margin-top text-center>
+      <ion-text>{{ location.address }}</ion-text>
+    </div>
+    <div text-center>
+      <ion-text>{{ location.citystatezip }}</ion-text>
+    </div>
+    <p text-center>
+      <ion-text>
+        <a href="tel:{{ location.phone }}">{{ location.phone }}</a> &bull; <a href="mailto:{{ location.email }}">{{ location.email }}</a>
+      </ion-text>
+    </p>
+    <div *ngIf="location.hoursnote" text-center>
+      <ion-text>
+        <strong>{{ location.hoursnote }}</strong>
+      </ion-text>
+    </div>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="5" text-right padding-horizontal>Sunday</ion-col>
+        <ion-col size="7">{{ location.sunday }}</ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="5" text-right padding-horizontal>Monday</ion-col>
+        <ion-col size="7">{{ location.monday }}</ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="5" text-right padding-horizontal>Tuesday</ion-col>
+        <ion-col size="7">{{ location.tuesday }}</ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="5" text-right padding-horizontal>Wednesday</ion-col>
+        <ion-col size="7">{{ location.wednesday }}</ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="5" text-right padding-horizontal>Thursday</ion-col>
+        <ion-col size="7">{{ location.thursday }}</ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="5" text-right padding-horizontal>Friday</ion-col>
+        <ion-col size="7">{{ location.friday }}</ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="5" text-right padding-horizontal>Saturday</ion-col>
+        <ion-col size="7">{{ location.saturday }}</ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+</ion-content>

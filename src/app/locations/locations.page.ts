@@ -4,8 +4,9 @@ import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular
 import { Platform, ModalController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 import { Globals } from '../globals';
-import { ToastService } from '../services/toast.service';
 import { format, formatDistance, isBefore } from 'date-fns';
+import { ToastService } from '../services/toast.service';
+import { LocationDetailPage } from '../location-detail/location-detail.page';
 
 @Component({
   selector: 'app-locations',
@@ -59,6 +60,25 @@ export class LocationsPage implements OnInit {
         }
       });
     }
+  }
+
+  async view_details(location:any) {
+    this.subscription.unsubscribe();
+    const modal = await this.modalController.create({
+      component: LocationDetailPage,
+      componentProps: {
+        "location": location,
+      }
+    });
+    modal.onDidDismiss().then((dataReturned) => {
+      if (dataReturned !== null) {
+        console.log('Modal sent data: ', dataReturned);
+        this.subscription = this.platform.backButton.subscribe(() => {
+          this._location.back();
+        });
+      }
+    });
+    return await modal.present();
   }
 
 

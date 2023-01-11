@@ -39,7 +39,7 @@
           </ion-text>
         </ion-label>
       </ion-item>
-      <ion-item *ngFor="let location of this.locations" detail="true" lines="full">
+      <ion-item *ngFor="let location of this.locations" (click)="view_details(location)" detail="true" lines="full">
         <ion-thumbnail slot="start" *ngIf="location.image">
           <ion-img [src]="location.image"></ion-img>
         </ion-thumbnail>
