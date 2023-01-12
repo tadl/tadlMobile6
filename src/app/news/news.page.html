@@ -36,7 +36,7 @@
     </div>
 
     <ion-list *ngIf="this.news">
-      <ion-item *ngFor="let post of this.news" detail="true">
+      <ion-item *ngFor="let post of this.news" (click)="this.globals.open_page(post.featured_image_urls.thumbnail)" detail="true">
         <ion-thumbnail slot="start">
           <ion-img *ngIf="post.featured_image_urls.thumbnail" [src]="post.featured_image_urls.thumbnail"></ion-img>
         </ion-thumbnail>
