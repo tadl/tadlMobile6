@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'org.tadl.tadl',
   appName: 'tadlMobile6',
   webDir: 'www',
   bundledWebRuntime: false
