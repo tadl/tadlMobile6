@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Platform, ModalController, MenuController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
+import { Browser } from '@capacitor/browser';
 
 @Injectable()
 
@@ -169,6 +170,11 @@ export class Globals {
   public audiences: Array<string> = [ "All", "Adult", "Young Adult", "Juvenile" ];
 
   /* FUNctions */
+
+  /* to open links in a browser */
+  async open_page(url:string) {
+    await Browser.open({ url: url });
+  }
 
   /* date formatter */
   format_date(str:string, fmt?:string) {

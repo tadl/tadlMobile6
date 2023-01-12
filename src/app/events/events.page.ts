@@ -4,7 +4,6 @@ import { Location } from '@angular/common';
 import { Platform, ModalController, InfiniteScrollCustomEvent } from '@ionic/angular';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
-import { EventDetailPage } from '../event-detail/event-detail.page';
 
 @Component({
   selector: 'app-events',

@@ -44,14 +44,6 @@ const routes: Routes = [
     loadChildren: () => import('./checkouts/checkouts.module').then( m => m.CheckoutsPageModule)
   },
   {
-    path: 'event-detail',
-    loadChildren: () => import('./event-detail/event-detail.module').then( m => m.EventDetailPageModule)
-  },
-  {
-    path: 'news-detail',
-    loadChildren: () => import('./news-detail/news-detail.module').then( m => m.NewsDetailPageModule)
-  },
-  {
     path: 'item-detail',
     loadChildren: () => import('./item-detail/item-detail.module').then( m => m.ItemDetailPageModule)
   },
