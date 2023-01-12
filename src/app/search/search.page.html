@@ -19,6 +19,103 @@
   </ion-header>
 
   <div id="container">
+
+    <form action=".">
+      <ion-item lines="none" class="searchbox">
+        <ion-searchbar (search)="get_results()" [(ngModel)]="query" [ngModelOptions]="{standalone: true}" placeholder="Search" debounce="10" class="searchbox-left"></ion-searchbar>
+        <ion-button color="primary" size="default" slot="end" expand="full" (click)="get_results()" class="searchbox-right">Go</ion-button>
+      </ion-item>
+      <ion-item-divider>
+        <ion-toggle slot="start" [(ngModel)]="advanced" [ngModelOptions]="{standalone: true}" name="advanced"></ion-toggle>
+        <ion-label><p style="margin-left: 10px;">ADVANCED OPTIONS</p></ion-label>
+      </ion-item-divider>
+      <ion-list *ngIf="advanced" lines="full">
+        <ion-item>
+          <ion-label>Search Type</ion-label>
+          <ion-select [(ngModel)]="type" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" [value]="type" interface="popover">
+            <ion-select-option value="keyword">Keyword</ion-select-option>
+            <ion-select-option value="author">Author</ion-select-option>
+            <ion-select-option value="title">Title</ion-select-option>
+            <ion-select-option value="subject">Subject</ion-select-option>
+            <ion-select-option value="series">Series</ion-select-option>
+            <ion-select-option value="single_genre">Genre</ion-select-option>
+            <ion-select-option value="call_numbers">Call Number</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Format</ion-label>
+          <ion-select [(ngModel)]="format" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" [value]="format" interface="popover">
+            <ion-select-option  *ngFor="let format of globals.formats" [value]="format">
+              {{ format }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ng-template [ngIf]="globals.multi_location == true">
+          <ion-item>
+            <ion-label>Location</ion-label>
+            <ion-select [(ngModel)]="location" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" [value]="location" interface="popover">
+              <ion-select-option  *ngFor="let location of globals.search_locations" [value]="location.code">
+                {{ location.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ng-template>
+        <ion-item *ngIf="globals.has_audiences == true">
+          <ion-label>Audience</ion-label>
+          <ion-select [(ngModel)]="audiences" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" [value]="audience" interface="popover">
+            <ion-select-option *ngFor="let audience of globals.audiences" [value]="audience">
+              {{ audience }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Sort By</ion-label>
+          <ion-select [(ngModel)]="sort" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" [value]="sort" interface="popover">
+            <ion-select-option  *ngFor="let option of globals.sort_options" [value]="option[1]" [disabled]="type == 'keyword'">
+              {{ option[0] }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Only Show Available Items</ion-label>
+          <ion-checkbox slot="end" [(ngModel)]="limit_available" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" color="primary"></ion-checkbox>
+        </ion-item>
+        <ion-item>
+          <ion-label>Only Show Physical Items</ion-label>
+          <ion-checkbox  [(ngModel)]="limit_physical" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" color="primary"></ion-checkbox>
+        </ion-item>
+        <ion-item>
+          <ion-label>
+            <ion-button expand="full" href="https://www.mel.org/">Search MeLCat</ion-button>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </form>
+    <ion-item *ngFor="let result of results">
+      <ion-thumbnail slot="start">
+        <ion-img [src]="globals.catalog_covers_medium + result.id"></ion-img>
+      </ion-thumbnail>
+      <ion-label>
+        <ion-text>
+          <h2 [innerHTML]="result.title_display"></h2>
+        </ion-text>
+        <ion-text>
+          <p [innerHTML]="result.author_brief"><p>
+        </ion-text>
+        <ion-text>
+          <p>
+            <ion-icon [name]="globals.item_type.get(result.type_of_resource)"></ion-icon>
+            <ion-text *ngIf="!result.electronic" [color]="(result.availability.copies_all_available > 0) ? 'primary' : 'dark'"> {{ result.availability.copies_all_available }} available </ion-text>
+            <ion-text color="dark" *ngIf="!result.electronic"> / {{ result.holdings[0].call_number }} </ion-text>
+            <ion-text color="dark" *ngIf="result.electronic"> Electronic resource from {{ result.source }} </ion-text>
+          </p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
   </div>
+
+  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
 </ion-content>
