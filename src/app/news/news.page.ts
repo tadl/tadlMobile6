@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Globals } from '../globals';
-import { Platform, ModalController, InfiniteScrollCustomEvent } from '@ionic/angular';
+import { Platform, ModalController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
-import { NewsDetailPage } from '../news-detail/news-detail.page';
 
 @Component({
   selector: 'app-news',
@@ -14,10 +13,8 @@ import { NewsDetailPage } from '../news-detail/news-detail.page';
 export class NewsPage implements OnInit {
 
   url: string = this.globals.news_api_url;
-  news: any;
+  news: any = [];
   page: any = 1;
-  loading_more: boolean = false;
-  infinite: any;
   subscription: any;
 
   constructor(
@@ -29,17 +26,35 @@ export class NewsPage implements OnInit {
     private _location: Location,
   ) { }
 
-  get_news(page:number, refresher?:string) {
-    let params = new HttpParams()
+  get_news() {
+    this.globals.loading_show();
+    this.http.get(this.url)
+      .subscribe(data => {
+        this.globals.api_loading = false;
+        if (data) {
+          this.news = data;
+          console.log(this.news);
+        } else {
+          this.toast.presentToast(this.globals.server_error_msg);
+        }
+    }, (err) => {
+      this.globals.api_loading = false;
+        this.toast.presentToast(this.globals.server_error_msg);
+    });
   }
 
-
-
-
-
-
-
   ngOnInit() {
+    this.get_news();
+  }
+
+  ionViewDidEnter() {
+    this.subscription = this.platform.backButton.subscribe(() => {
+      this._location.back();
+    });
+  }
+
+  ionViewWillLeave() {
+    this.subscription.unsubscribe();
   }
 
 }
