@@ -45,7 +45,7 @@
         </ion-select>
       </ion-item>
 
-      <ion-item *ngFor="let event of this.web_events" detail="true">
+      <ion-item *ngFor="let event of this.web_events" (click)="this.globals.open_page(event.url)" detail="true">
         <ion-thumbnail slot="start" *ngIf="event.image">
           <ion-img [src]="event.image"></ion-img>
         </ion-thumbnail>
