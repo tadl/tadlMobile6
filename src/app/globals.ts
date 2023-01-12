@@ -196,21 +196,32 @@ export class Globals {
     return format(new Date(), 'EEEE');
   }
 
-  /* toggles for added content on item detail */
-  /* not yet
+
   show_more(id:string, type:string) {
     var div_to_hide = id + '-' + type;
     var div_to_show = div_to_hide + '-full';
-    document.getElementById(div_to_show).setAttribute('style', 'display: block');
-    document.getElementById(div_to_hide).setAttribute('style', 'display: none');
+    const show_this = document.getElementById(div_to_show)
+    if(show_this != null){
+      show_this.setAttribute('style', 'display: block');
+    }
+    const hide_this = document.getElementById(div_to_hide)
+    if(hide_this != null){
+      hide_this.setAttribute('style', 'display: none');
+    }
   }
-  show_less(id, type) {
+  show_less(id:string, type:string) {
     var div_to_show = id + '-' + type
     var div_to_hide = div_to_show + '-full'
-    document.getElementById(div_to_show).setAttribute("style", "display: block")
-    document.getElementById(div_to_hide).setAttribute("style", "display: none")
+    const show_this = document.getElementById(div_to_show)
+    if(show_this != null){
+      show_this.setAttribute('style', 'display: block');
+    }
+    const hide_this = document.getElementById(div_to_hide)
+    if(hide_this != null){
+      hide_this.setAttribute('style', 'display: none');
+    }
   }
-  */
+
 
   /* opens account menu */
   open_account_menu() {
