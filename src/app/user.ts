@@ -5,6 +5,7 @@ import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular
 import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
 import { Storage } from '@ionic/storage-angular';
+import {Events} from './event_service'
 
 @Injectable({ providedIn: 'root' })
 
@@ -32,6 +33,7 @@ export class User {
   item:{};
 
   constructor(
+    public events: Events,
     public toast: ToastController,
     public actionSheetController: ActionSheetController,
     public globals: Globals,
@@ -77,12 +79,12 @@ export class User {
       this.show_error_message("Invalid username and/or password. Please try again.");
     } else {
       this.update_user_object(data.user);
+      this.process_checkouts(data)
     }
     this.globals.api_loading = false;
   }
 
   async update_user_object(data : any={}) {
-    this.logged_in = true;
     this.token = data['token'];
     this.full_name = data['full_name'];
     this.checkout_count = data['checkouts'];
@@ -96,6 +98,11 @@ export class User {
     this.default_pickup = data['pickup_library'];
     this.storage.set('username', this.username);
     this.storage.set('hashed_password', this.hashed_password);
+    this.globals.api_loading = false;
+    if(this.logged_in == false){
+      this.logged_in = true
+      this.events.publish('logged in');
+    }
   }
 
   async confirm_logout() {
@@ -163,6 +170,7 @@ export class User {
     this.default_pickup = '';
     this.preferences = {};
     this.fines = [];
+    this.checkouts = [];
     this.storage.remove('hashed_password');
     this.storage.remove('username');
   }
@@ -185,7 +193,6 @@ export class User {
   process_checkouts(data: any={}) {
     this.globals.api_loading = false;
     let date_today = format(new Date(), 'MM/dd/yyyy');
-    console.log(data)
     this.update_user_object(data['user'])
     data = data['checkouts']
     data.forEach(function(checkout: any={} , index = 0) {

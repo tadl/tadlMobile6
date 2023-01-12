@@ -1,0 +1,153 @@
+<ion-header>
+  <ion-progress-bar *ngIf="globals.api_loading" type="indeterminate"></ion-progress-bar>
+    <ion-toolbar>
+      <ion-title>Item Detail</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="globals.close_modal()" class="button button-clear">Close</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12">
+          <h2 class="detail-title"><ion-icon [name]="globals.item_type.get(item.type_of_resource)" size="large"></ion-icon> <span [innerHTML]="item.title_display"></span></h2>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <img [src]="globals.catalog_covers_large + item.id" class="detail-cover-image" float-left style="width:40%">
+          <h4 class="detail-author" *ngIf="item.author_brief">{{ item.author_brief }}</h4>
+          <p *ngIf="item.abstract" padding-bottom class="detail-description" [id]="item.id + '-abstract'">
+            {{  showAbstract(item) | truncate : 250  }}
+            <ion-button size="small" float-right color="light" *ngIf="item.abstract.length > 250">Show More</ion-button>
+          </p>
+          <div *ngIf="item.abstract" padding-bottom class="detail-description" [id]="item.id + '-abstract-full'" style="display: none">
+            <div *ngFor="let part of item.abstract_array">{{ part }}</div>
+            <ion-button size="small" float-right color="light">Show Less</ion-button>
+          </div>
+          <p *ngIf="item.contents" class="detail-contents" [id]="item.id + '-content'">
+            {{  showContents(item) | truncate : 250  }}
+            <ion-button size="small" float-right color="light" *ngIf="item.contents.length > 250">Show More</ion-button>
+          </p>
+          <div *ngIf="item.contents" class="detail-contents" [id]="item.id + '-content-full'" style="display: none">
+            <div *ngFor="let part of item.contents_array">{{ part }}</div>
+            <ion-button size="small" float-right color="light"></ion-button>
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-card class="detail-hold" *ngIf="item.hold_id">
+            <ion-card-header>
+              <ion-card-subtitle>You have this item on hold</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <p *ngIf="item.hold_status != ''">Position {{ item.queue_state[0] }} in queue with {{ item.queue_state[1] }} eligible cop<span *ngIf="item.queue_state[1] > 1 || item.queue_state[1] == 0">ies</span><span *ngIf="item.queue_state[1] == 1">y</span></p>
+              <p *ngIf="globals.multi_location == true && item.queue_status.startsWith('Ready')">Pickup location: {{ item.pickup_location }}</p>
+              <p *ngIf="globals.multi_location == true && !item.queue_status.startsWith('Ready')">
+                <ion-label>Pickup Location (click to change)</ion-label>
+                <ion-select class="full-width-select" interface="popover" [value]="item.pickup_location_code">
+                  <ion-select-option *ngFor="let loc of globals.pickup_locations" [value]="loc.code">
+                    {{ loc.name }}
+                  </ion-select-option>
+                </ion-select>
+              </p>
+              <p *ngIf="item.hold_status != ''">Status:
+                <span *ngIf="item.hold_status == 'Suspended'"><ion-text color="danger">{{ item.hold_status }}</ion-text></span>
+                <span *ngIf="item.hold_status == 'Active'"><ion-text color="success">{{ item.hold_status }}<span *ngIf="item.queue_status != ''"> - <ion-text color="primary">{{ item.queue_status }}</ion-text></span></ion-text></span>
+              </p>
+              <ion-button expand="full" *ngIf="item.hold_status == 'Suspended'">Activate</ion-button>
+              <ion-button expand="full" *ngIf="item.hold_status != 'Suspended' && !item.queue_status.startsWith('Ready')">Suspend</ion-button>
+              <ion-button expand="full">Cancel</ion-button>
+            </ion-card-content>
+          </ion-card>
+          <ion-card class="detail-checkout" *ngIf="item.checkout_id">
+            <ion-card-header>
+              <ion-card-subtitle>You have this item checked out</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <h2 *ngIf="item.overdue"><ion-text color="danger">OVERDUE</ion-text></h2>
+              <p>Copy number {{ item.barcode }}</p>
+              <p>Due {{ item.due_date }} ({{ item.due_words }})</p>
+              <p><span *ngIf="item.renew_attempts <= 0">No </span><span *ngIf="item.renew_attempts > 0">{{ item.renew_attempts }} </span>Renewal<span *ngIf="(item.renew_attempts > 1) || (item.renew_attempts <= 0)">s</span> remaining</p>
+              <ion-button expand="full" *ngIf="item.renew_attempts > 0">Renew</ion-button>
+            </ion-card-content>
+          </ion-card>
+          <ion-card class="detail-history" *ngIf="item.barcode && item.checkout_date && item.return_date">
+            <ion-card-header>
+              <ion-card-subtitle>You've checked out this item</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Copy number {{ item.barcode }}</p>
+              <p *ngIf="item.return_date == '*'">Currently checked out; due {{ item.due_date }}</p>
+              <p>Checked out {{ item.checkout_date }}</p>
+              <p *ngIf="item.return_date != '*'">Returned: {{ item.return_date }}</p>
+            </ion-card-content>
+          </ion-card>
+          <p class="detail-publisher" *ngIf="item.publisher">Published by {{ item.publisher }}<span *ngIf="item.publisher_location">, {{ item.publisher_location }}</span><span *ngIf="item.sort_year">, {{ item.sort_year }}</span></p>
+          <p class="detail-description" *ngIf="item.physical_description" [innerHTML]="item.physical_description"></p>
+          <p class="detail-electronic" *ngIf="item.electronic == true">Electronic resource from {{ item.source }}</p>
+          <p class="detail-availability" *ngIf="item.availability.copies_all > 0"><span *ngIf="item.hold_count > 0">{{ item.hold_count }} hold<span *ngIf="item.hold_count > 1">s</span> on </span>{{ item.availability.copies_all }} cop<span *ngIf="item.availability.copies_all == 1">y</span><span *ngIf="item.availability.copies_all > 1">ies</span><span *ngIf="item.availability.copies_all_available > 0">, {{ item.availability.copies_all_available }} available</span>.</p>
+          <ion-button expand="full" *ngIf="item.electronic == true" [href]="item.eresource_link">View Resource</ion-button>
+          <ion-button expand="full" *ngIf="user.logged_in && item.electronic != true && item.holdable == true && !item.hold_id">Place Hold</ion-button>
+          <ion-button expand="full" *ngIf="!user.logged_in && item.electronic != true && item.holdable == true && !item.hold_id">Log In to Place Hold</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  
+    <div *ngIf="item.electronic != true" class="copy-details">
+      <div padding>
+        <ion-segment [(ngModel)]="items">
+          <ion-segment-button value="Available">
+            Available Copies
+          </ion-segment-button>
+          <ion-segment-button value="All Copies">
+            All Copies
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+      <div [ngSwitch]="items">
+        <ion-list *ngSwitchCase="'Available'">
+          <ion-item *ngIf="item.availability.copies_all_available > 0">
+            <strong>Location</strong>
+            <ion-badge slot="end">Call Number</ion-badge>
+          </ion-item>
+          <div *ngFor="let location of item.availability.by_location">
+            <div *ngIf="location.copies_available > 0">
+              <ion-item-divider *ngIf="globals.multi_location == true">{{ globals.short_to_friendly_name.get(location.name_compact) }}</ion-item-divider>
+              <ion-item *ngFor="let shelf of location.shelving_locations" text-wrap>
+                {{ shelf.available_copies }} in {{ shelf.shelving_location }}
+                <ion-badge slot="end">{{ shelf.call_number }}</ion-badge>
+              </ion-item>
+            </div>
+          </div>
+        </ion-list>
+        <ion-list *ngSwitchCase="'All Copies'">
+          <ion-item *ngIf="item.availability.copies_all != 0">
+            <ion-grid>
+              <ion-row>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">Location</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">Shelf</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">Shelf/Call Num</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">Call Num</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4"><ion-text class="small-text">Status</ion-text></ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+          <ion-item *ngFor="let copy of item.holdings">
+            <ion-grid>
+              <ion-row>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">{{ globals.short_to_friendly_name.get(copy.circ_lib) }}</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">{{ copy.location }}</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">{{ copy.location }} / {{ copy.call_number }}</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">{{ copy.call_number }}</ion-text></ion-col>
+                <ion-col class="detail" text-wrap size="4"><ion-text class="small-text">{{ copy.status }}<span *ngIf="copy.due_date"><br/>Due {{ copy.due_date }}</span></ion-text></ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-item>
+        </ion-list>
+      </div>
+    </div>
+  </ion-content>

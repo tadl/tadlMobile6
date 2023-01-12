@@ -18,12 +18,12 @@
     </ion-item-divider>
     <ion-item-sliding *ngFor="let checkout of user.checkouts">
       <ion-item-options side="end">
-        <ion-item-option>Details</ion-item-option>
+        <ion-item-option (click)="details(checkout)">Details</ion-item-option>
         <ion-item-option *ngIf="checkout.renew_attempts > 0"  color="secondary">Renew</ion-item-option>
       </ion-item-options>
       <ion-item>
-        <ion-img slot="start" [src]="globals.catalog_covers_medium + checkout.id"></ion-img>
-        <ion-label>
+        <ion-img slot="start" [src]="globals.catalog_covers_medium + checkout.id" (click)="details(checkout)"></ion-img>
+        <ion-label (click)="details(checkout)">
           <h2><ion-text color="danger" *ngIf="checkout.overdue">(OVERDUE) </ion-text><ion-text [innerHTML]="checkout.title"></ion-text></h2>
           <ion-text>
             <p *ngIf="checkout.author_brief" [innerHTML]="checkout.author_brief"></p>
