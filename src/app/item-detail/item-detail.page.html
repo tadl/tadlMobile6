@@ -21,19 +21,19 @@
           <h4 class="detail-author" *ngIf="item.author_brief">{{ item.author_brief }}</h4>
           <p *ngIf="item.abstract" padding-bottom class="detail-description" [id]="item.id + '-abstract'">
             {{  showAbstract(item) | truncate : 250  }}
-            <ion-button size="small" float-right color="light" *ngIf="item.abstract.length > 250">Show More</ion-button>
+            <ion-button size="small" float-right color="light" *ngIf="item.abstract.length > 250" (click)='globals.show_more(item.id, "abstract")'>Show More</ion-button>
           </p>
           <div *ngIf="item.abstract" padding-bottom class="detail-description" [id]="item.id + '-abstract-full'" style="display: none">
             <div *ngFor="let part of item.abstract_array">{{ part }}</div>
-            <ion-button size="small" float-right color="light">Show Less</ion-button>
+            <ion-button size="small" float-right color="light" (click)='globals.show_less(item.id, "abstract")'>Show Less</ion-button>
           </div>
           <p *ngIf="item.contents" class="detail-contents" [id]="item.id + '-content'">
             {{  showContents(item) | truncate : 250  }}
-            <ion-button size="small" float-right color="light" *ngIf="item.contents.length > 250">Show More</ion-button>
+            <ion-button size="small" float-right color="light" *ngIf="item.contents.length > 250" (click)='globals.show_more(item.id, "content")'>Show More</ion-button>
           </p>
           <div *ngIf="item.contents" class="detail-contents" [id]="item.id + '-content-full'" style="display: none">
             <div *ngFor="let part of item.contents_array">{{ part }}</div>
-            <ion-button size="small" float-right color="light"></ion-button>
+            <ion-button size="small" float-right color="light"  (click)='globals.show_less(item.id, "content")'>Show Less</ion-button>
           </div>
         </ion-col>
       </ion-row>
