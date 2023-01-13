@@ -1,11 +1,12 @@
 import { Globals } from './globals';
 import { Component, ViewChild, NgZone, Injectable } from '@angular/core';
-import { ModalController, ActionSheetController, AlertController, NavController, ToastController} from '@ionic/angular';
+import { ModalController, ActionSheetController, AlertController, NavController} from '@ionic/angular';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
 import { Storage } from '@ionic/storage-angular';
 import {Events} from './event_service'
+import { ToastService } from './services/toast.service';
 
 @Injectable({ providedIn: 'root' })
 
@@ -34,9 +35,9 @@ export class User {
 
   constructor(
     public events: Events,
-    public toast: ToastController,
     public actionSheetController: ActionSheetController,
     public globals: Globals,
+    public toast: ToastService,
     private http: HttpClient,
     private zone: NgZone,
     private storage: Storage,
@@ -64,13 +65,8 @@ export class User {
   }
 
   async show_error_message(message = '') {
-    const error_msg = await this.toast.create({
-      message: message,
-      duration: 2000,
-      position: 'middle'
-    });
+    this.toast.presentToast(message);
     this.globals.api_loading = false;
-    error_msg.present();
   }
 
   async load_user_data(data: any={}) {
@@ -85,6 +81,12 @@ export class User {
   }
 
   async update_user_object(data : any={}) {
+    //not all API calls return the full user so check to see and if not fetch the user
+    if(data['checkouts'] == null){
+      console.log('full user not returned fetching user...')
+      this.login(true);
+      return 
+    }
     this.token = data['token'];
     this.full_name = data['full_name'];
     this.checkout_count = data['checkouts'];
@@ -188,6 +190,68 @@ export class User {
           error: (error) => this.show_error_message("Could not reach server. Please verify you have a data connection or try again later."),
         });
     }
+  }
+
+  renew(cid = '') {
+    let url = this.globals.catalog_renew_url;
+    let params = new HttpParams()
+      .set("token", this.token)
+      .set("checkout_ids", cid)
+      .set("v", "5");
+    this.globals.loading_show();
+    this.http.get(url, {params: params})
+      .subscribe((data: any) => {
+        this.globals.api_loading = false;
+        if (data['errors'].length == 0 && data['checkouts'] && data['user']) {
+          this.process_checkouts(data);
+          this.toast.presentToast(data['message']);
+        } else if (data['checkouts'] && data['user']) {
+          this.process_checkouts(data);
+          let message = data['message'] + ': ';
+          data['errors'].forEach(function(val: any) {
+            message += val['title'] + ': ' + val['message'];
+          });
+          this.toast.presentToast(message);
+        }
+        this.events.publish('renew_attempt_complete');
+      },
+      (err) => {
+        this.globals.api_loading = false;
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          const subscription = this.events.subscribe('action_retry', () => {
+            this.renew(cid);
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
+  }
+
+  async renew_all() {
+    const actionSheet = await this.actionSheetController.create({
+      header: "Attempt to renew all items?",
+      buttons: [{
+        text: 'Renew All',
+        handler: () => {
+          let to_renew = this.checkouts.filter(item => item['renew_attempts'] > 0).map(item => item['checkout_id']).join();
+          if (to_renew.length > 0) {
+            this.renew(to_renew);
+          } else {
+            this.toast.presentToast("No items eligible for renewal.", 5000);
+          }
+        }
+      }, {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+        }
+      }]
+    });
+    await actionSheet.present();
   }
 
   process_checkouts(data: any={}) {

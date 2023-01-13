@@ -15,12 +15,12 @@
   <div *ngIf="user.checkouts.length > 0">
     <ion-item-divider>
       <ion-label>{{ user.checkouts.length }} Items</ion-label>
-      <ion-button slot="end" *ngIf="user.checkouts.length > 0">Renew All</ion-button>
+      <ion-button slot="end" *ngIf="user.checkouts.length > 0" (click)="user.renew_all()">Renew All</ion-button>
     </ion-item-divider>
     <ion-item-sliding *ngFor="let checkout of user.checkouts">
       <ion-item-options side="end">
         <ion-item-option (click)="details(checkout)">Details</ion-item-option>
-        <ion-item-option *ngIf="checkout.renew_attempts > 0"  color="secondary">Renew</ion-item-option>
+        <ion-item-option *ngIf="checkout.renew_attempts > 0" (click)="user.renew(checkout.checkout_id)" color="secondary">Renew</ion-item-option>
       </ion-item-options>
       <ion-item>
         <ion-img slot="start" [src]="globals.catalog_covers_medium + checkout.id" (click)="details(checkout)"></ion-img>

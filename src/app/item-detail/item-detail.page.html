@@ -72,7 +72,7 @@
               <p>Copy number {{ item.barcode }}</p>
               <p>Due {{ item.due_date }} ({{ item.due_words }})</p>
               <p><span *ngIf="item.renew_attempts <= 0">No </span><span *ngIf="item.renew_attempts > 0">{{ item.renew_attempts }} </span>Renewal<span *ngIf="(item.renew_attempts > 1) || (item.renew_attempts <= 0)">s</span> remaining</p>
-              <ion-button expand="full" *ngIf="item.renew_attempts > 0">Renew</ion-button>
+              <ion-button expand="full" *ngIf="item.renew_attempts > 0" (click)="this.renew_from_details()">Renew</ion-button>
             </ion-card-content>
           </ion-card>
           <ion-card class="detail-history" *ngIf="item.barcode && item.checkout_date && item.return_date">

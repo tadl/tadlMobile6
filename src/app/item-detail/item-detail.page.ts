@@ -39,6 +39,14 @@ export class ItemDetailPage implements OnInit {
     return output;
   }
 
+  renew_from_details(){
+    this.user.renew(this.item.checkout_id)
+    const subscription = this.events.subscribe('renew_attempt_complete', () => {
+      this.item = this.user.checkouts.find( checkout => checkout['id'] == this.item['id']);
+      subscription.unsubscribe();
+    });
+  }
+
   ngOnInit() {
     this.items = this.item.availability.copies_all_available > 0 ? 'Available' : 'All Copies';
   }
