@@ -19,6 +19,7 @@ export class User {
   ils_username: string;
   checkout_count: string;
   checkouts: Array<any> = [];
+  holds: Array<any> = [];
   holds_count: string;
   holds_ready_count: string;
   overdue: string;
@@ -76,6 +77,7 @@ export class User {
     } else {
       this.update_user_object(data.user);
       this.process_checkouts(data)
+      this.process_holds(data)
     }
     this.globals.api_loading = false;
   }
@@ -252,6 +254,35 @@ export class User {
       }]
     });
     await actionSheet.present();
+  }
+
+  get_holds(){
+    if(this.logged_in){
+      console.log('trying to get holds...');
+      this.globals.loading_show();
+      let params = new HttpParams()
+      .set("token", this.token)
+      .set("v", "5");
+      this.globals.loading_show();
+      this.http.get(this.globals.catalog_holds_url, {params: params})
+        .subscribe({
+          next: (response) => this.process_holds(response),
+          error: (error) => this.show_error_message("Could not reach server. Please verify you have a data connection or try again later."),
+        });
+    }
+  }
+
+  process_holds(data: any) {
+    this.globals.api_loading = false;
+    this.update_user_object(data['user'])
+    data = data['holds']
+    let existing = this.holds.map(item => item['hold_id'] + item['hold_status'] + item['queue_status'] + item['queue_state'][0] + item['queue_state'][1] + item['pickup_location_code']).join();
+    let newdata = data.map((item: any) => item['hold_id'] + item['hold_status'] + item['queue_status'] + item['queue_state'][0] + item['queue_state'][1] + item['pickup_location_code']).join();
+    if (existing != newdata) {
+      this.zone.run(() => {
+        this.holds = data;
+      });
+    }
   }
 
   process_checkouts(data: any={}) {

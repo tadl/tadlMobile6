@@ -12,5 +12,40 @@
 </ion-header>
 
 <ion-content>
+  
+  <div *ngIf="user.holds.length > 0">
+    <ion-item-divider>
+      <ion-label>{{ user.holds.length }} Items</ion-label>
+    </ion-item-divider>
+    <ion-item-sliding *ngFor="let hold of this.user.holds">
+      <ion-item-options side="end">
+        <ion-item-option color="secondary" *ngIf="hold.hold_status == 'Suspended'">Activate</ion-item-option>
+        <ion-item-option color="secondary" *ngIf="hold.hold_status != 'Suspended' && !hold.queue_status.startsWith('Ready')">Suspend</ion-item-option>
+        <ion-item-option (click)="details(hold)">Details</ion-item-option>
+        <ion-item-option color="danger">Cancel</ion-item-option>
+      </ion-item-options>
+      <ion-item>
+        <ion-img slot="start" [src]="globals.catalog_covers_medium + hold.id" (click)="details(hold)"></ion-img>
+        <ion-label (click)="details(hold)">
+          <h2><ion-text [innerHTML]="hold.title_display"></ion-text></h2>
+          <ion-text>
+            <p *ngIf="hold.author_brief" [innerHTML]="hold.author_brief"></p>
+            <p *ngIf="hold.hold_status != ''">Position {{ hold.queue_state[0] }} in queue with {{ hold.queue_state[1] }} eligible cop<span *ngIf="hold.queue_state[1] > 1 || hold.queue_state[1] == 0">ies</span><span *ngIf="hold.queue_state[1] == 1">y</span></p>
+            <p *ngIf="globals.multi_location == true">Pickup location: {{ hold.pickup_location }}</p>
+            <p *ngIf="hold.hold_status != ''">Status:
+              <span *ngIf="hold.hold_status == 'Suspended'"><ion-text color="danger">{{ hold.hold_status }}</ion-text></span>
+              <span *ngIf="hold.hold_status == 'Active'"><ion-text color="success">{{ hold.hold_status }}<span *ngIf="hold.queue_status != ''"> - <ion-text color="primary">{{ hold.queue_status }}</ion-text></span></ion-text></span>
+            </p>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+    </ion-item-sliding>
+  </div>
+  <div *ngIf="user.holds.length == 0 && user.holds_count != '0'">
+    <p margin>Holds are loading. One moment...</p>
+  </div>
+  <div *ngIf="user.holds_count == '0'">
+    <p margin>You have no items on hold.</p>
+  </div>
 
 </ion-content>
