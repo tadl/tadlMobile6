@@ -38,11 +38,11 @@
               <ion-label>Checkouts</ion-label>
               <ion-badge slot="end">{{user.checkout_count}}</ion-badge>
             </ion-item>
-            <ion-item [disabled]="user.holds_count == '0'">
+            <ion-item [disabled]="user.holds_count == '0'" routerLink="/holds">
               <ion-label>Holds</ion-label>
               <ion-badge slot="end">{{ user.holds_count }}</ion-badge>
             </ion-item>
-            <ion-item [disabled]="user.holds_ready_count == '0'">
+            <ion-item [disabled]="user.holds_ready_count == '0'" routerLink="/holds">
               <ion-label>Holds Ready for Pickup</ion-label>
               <ion-badge slot="end">{{ user.holds_ready_count }}</ion-badge>
             </ion-item>

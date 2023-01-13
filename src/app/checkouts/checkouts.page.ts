@@ -43,12 +43,10 @@ export class CheckoutsPage implements OnInit {
   }
 
   ngOnInit() {
-    if(this.user.logged_in){
-      this.user.get_checkouts()
-    }
   }
 
   ionViewDidEnter() {
+    this.user.get_checkouts()
     this.subscription = this.platform.backButton.subscribe(() => {
       this._location.back();
     });

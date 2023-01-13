@@ -36,16 +36,13 @@
     </div>
 
     <ion-list *ngIf="this.news">
-      <ion-item *ngFor="let post of this.news" (click)="this.globals.open_page(post.featured_image_urls.thumbnail)" detail="true">
+      <ion-item *ngFor="let post of this.news" (click)="this.globals.open_page(post.post_url)" detail="true">
         <ion-thumbnail slot="start">
           <ion-img *ngIf="post.featured_image_urls.thumbnail" [src]="post.featured_image_urls.thumbnail"></ion-img>
         </ion-thumbnail>
         <ion-label>
           <ion-text>
             <h2 [innerHTML]="post.title.rendered"></h2>
-          </ion-text>
-          <ion-text>
-            <p [innerHTML]="post.excerpt.rendered"></p>
           </ion-text>
           <ion-text color="medium">
             <p>Posted {{ globals.format_date(post.date, 'news') }}</p>
