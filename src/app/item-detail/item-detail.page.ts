@@ -43,8 +43,27 @@ export class ItemDetailPage implements OnInit {
     this.user.renew(this.item.checkout_id)
     const subscription = this.events.subscribe('renew_attempt_complete', () => {
       this.item = this.user.checkouts.find( checkout => checkout['id'] == this.item['id']);
+      console.log('I fired')
       subscription.unsubscribe();
     });
+  }
+
+  manage_hold_from_details(task: any){
+    this.user.manage_hold(this.item, task)
+    let subscription = this.events.subscribe('manage_hold_complete', () => {
+      this.item = this.user.holds.find( hold => hold['id'] == this.item['id']);
+      console.log('I fired to actually cancel')
+      subscription.unsubscribe();
+   });
+  }
+
+  cancel_hold_from_details(){
+    this.user.cancel_hold(this.item)
+    let subscription = this.events.subscribe('manage_hold_complete', () => {
+      this.item.hold_id = this.user.holds.find( hold => hold['id'] == this.item['id']);
+      console.log('I fired to cancel')
+      subscription.unsubscribe();
+   });
   }
 
   ngOnInit() {

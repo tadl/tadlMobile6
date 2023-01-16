@@ -48,7 +48,7 @@
               <p *ngIf="globals.multi_location == true && item.queue_status.startsWith('Ready')">Pickup location: {{ item.pickup_location }}</p>
               <p *ngIf="globals.multi_location == true && !item.queue_status.startsWith('Ready')">
                 <ion-label>Pickup Location (click to change)</ion-label>
-                <ion-select class="full-width-select" interface="popover" [value]="item.pickup_location_code">
+                <ion-select class="full-width-select" interface="popover" [value]="item.pickup_location_code" (ionChange)="user.change_hold_pickup(item, $event)">
                   <ion-select-option *ngFor="let loc of globals.pickup_locations" [value]="loc.code">
                     {{ loc.name }}
                   </ion-select-option>
@@ -58,9 +58,9 @@
                 <span *ngIf="item.hold_status == 'Suspended'"><ion-text color="danger">{{ item.hold_status }}</ion-text></span>
                 <span *ngIf="item.hold_status == 'Active'"><ion-text color="success">{{ item.hold_status }}<span *ngIf="item.queue_status != ''"> - <ion-text color="primary">{{ item.queue_status }}</ion-text></span></ion-text></span>
               </p>
-              <ion-button expand="full" *ngIf="item.hold_status == 'Suspended'">Activate</ion-button>
-              <ion-button expand="full" *ngIf="item.hold_status != 'Suspended' && !item.queue_status.startsWith('Ready')">Suspend</ion-button>
-              <ion-button expand="full">Cancel</ion-button>
+              <ion-button expand="full" *ngIf="item.hold_status == 'Suspended'" (click)="this.manage_hold_from_details('activate')">Activate</ion-button>
+              <ion-button expand="full" *ngIf="item.hold_status != 'Suspended' && !item.queue_status.startsWith('Ready')" (click)="this.manage_hold_from_details('suspend')">Suspend</ion-button>
+              <ion-button expand="full" (click)="this.cancel_hold_from_details()">Cancel</ion-button>
             </ion-card-content>
           </ion-card>
           <ion-card class="detail-checkout" *ngIf="item.checkout_id">

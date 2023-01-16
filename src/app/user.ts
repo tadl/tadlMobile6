@@ -285,6 +285,97 @@ export class User {
     }
   }
 
+  manage_hold(hold: any, task: string) {
+    let url = this.globals.catalog_holds_manage_url;
+    let params = new HttpParams()
+      .set("token", this.token)
+      .set("hold_id", hold.hold_id)
+      .set("task", task)
+      .set("v", "5");
+    if (task == "activate") { var action = "activated"; }
+    else if (task == "suspend") { var action = "suspended"; }
+    else if (task == "cancel") { var action = "canceled"; }
+    this.globals.loading_show();
+    this.http.get(url, {params: params})
+      .subscribe((data: any) => {
+        this.globals.api_loading = false;
+        if (data['holds'] && data['user']) {
+          this.process_holds(data);
+          this.update_user_object(data['user']);
+          this.toast.presentToast("Successfully " + action + " hold on " + hold.title_display + ".", 5000);
+        }
+        this.events.publish('manage_hold_complete');
+      },
+      (err) => {
+        this.globals.api_loading = false;
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          let subscription = this.events.subscribe('action_retry', () => {
+            this.manage_hold(hold, task);
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
+  }
+
+  async cancel_hold(hold: any) {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Cancel hold on ' + hold.title_display,
+      buttons: [{
+        text: 'Cancel Hold',
+        role: 'destructive',
+        handler: () => {
+          this.manage_hold(hold, 'cancel');
+        }
+      }, {
+        text: 'Nevermind',
+        role: 'cancel',
+        handler: () => {
+        }
+      }]
+    });
+    await actionSheet.present();
+  }
+
+  change_hold_pickup(hold: any, newloc: any) {
+    let url = this.globals.catalog_change_hold_pickup_url;
+    let params = new HttpParams()
+      .set("token", this.token)
+      .set("hold_id", hold.hold_id)
+      .set("hold_status", hold.hold_status)
+      .set("pickup_location", newloc.detail.value)
+      .set("v", "5");
+    this.globals.loading_show();
+    this.http.get(url, {params: params})
+      .subscribe((data: any) => {
+        this.globals.api_loading = false;
+        if (data['hold_id'] == hold.hold_id) {
+          this.zone.run(() => {
+            this.holds.find(item => item['hold_id'] == data['hold_id'])['pickup_location'] = data['pickup_location'];
+            this.holds.find(item => item['hold_id'] == data['hold_id'])['pickup_location_code'] = data['pickup_location_code'];
+            this.toast.presentToast('Changed pickup location for ' + hold.title_display + ' to ' + data['pickup_location'], 5000);
+          });
+        }
+      },
+      (err) => {
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          let subscrition = this.events.subscribe('action_retry', () => {
+            this.change_hold_pickup(hold, newloc);
+            subscrition.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
+  }
+
   process_checkouts(data: any={}) {
     this.globals.api_loading = false;
     let date_today = format(new Date(), 'MM/dd/yyyy');
