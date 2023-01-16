@@ -283,6 +283,7 @@ export class User {
         this.holds = data;
       });
     }
+    this.events.publish('process_holds_complete');
   }
 
   manage_hold(hold: any, task: string) {
@@ -401,6 +402,7 @@ export class User {
         this.checkouts = data;
       });
     }
+    this.events.publish('process_checkouts_complete');
   }
 
 

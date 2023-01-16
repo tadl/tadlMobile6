@@ -4,6 +4,7 @@ import { Globals } from '../globals';
 import { User } from '../user';
 import { Platform, ModalController } from '@ionic/angular';
 import { ItemDetailPage } from '../item-detail/item-detail.page';
+import {Events} from '../event_service'
 
 @Component({
   selector: 'app-holds',
@@ -14,6 +15,7 @@ export class HoldsPage implements OnInit {
   subscription: any;
 
   constructor(
+    public events: Events,
     public modalController: ModalController,
     public globals: Globals,
     public user: User,
@@ -38,6 +40,14 @@ export class HoldsPage implements OnInit {
       }
     });
     return await modal.present();
+  }
+
+  refresh_holds(event: any) {
+    this.user.get_holds();
+    let subscription = this.events.subscribe('process_holds_complete', () => {
+      event.target.complete();
+      subscription.unsubscribe();
+    });
   }
 
   ngOnInit() {

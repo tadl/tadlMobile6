@@ -13,6 +13,15 @@
 
 <ion-content>
   
+  <ion-refresher slot="fixed" (ionRefresh)="refresh_holds($event)">
+    <ion-refresher-content
+    pullingIcon="chevron-down-circle-outline"
+    pullingText="Pull to refresh"
+    refreshingSpinner="circles"
+    refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <div *ngIf="user.holds.length > 0">
     <ion-item-divider>
       <ion-label>{{ user.holds.length }} Items</ion-label>
