@@ -19,6 +19,14 @@ export class ItemDetailPage implements OnInit {
     public events: Events,
   ) { }
 
+  place_hold_from_details(){
+    this.user.place_hold(this.item.id, 'false')
+    let subscription = this.events.subscribe('process_holds_complete', () => {
+      this.item = this.user.holds.find( hold => hold['id'] == this.item['id']);
+      subscription.unsubscribe();
+   });
+  }
+
   showContents(item: any) {
     var output = '';
     if (item.contents_array[1] == null) {

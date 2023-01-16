@@ -35,9 +35,11 @@ export class User {
   item:{};
 
   constructor(
-    public events: Events,
     public actionSheetController: ActionSheetController,
+    public alertController: AlertController,
+    public events: Events,
     public globals: Globals,
+    public modalController: ModalController,
     public toast: ToastService,
     private http: HttpClient,
     private zone: NgZone,
@@ -175,6 +177,8 @@ export class User {
     this.preferences = {};
     this.fines = [];
     this.checkouts = [];
+    this.holds = []
+    this.checkouts = []
     this.storage.remove('hashed_password');
     this.storage.remove('username');
   }
@@ -284,6 +288,76 @@ export class User {
       });
     }
     this.events.publish('process_holds_complete');
+  }
+
+  async login_and_place_hold(id: string) {
+    const onClosedData: string = "Wrapped up!";
+    await this.modalController.dismiss(onClosedData);
+    this.globals.open_account_menu();
+    const subscription = this.events.subscribe('logged in', () => {
+      console.log('I think you logged in')
+      this.place_hold(id, 'false');
+      subscription.unsubscribe();
+    });
+  }
+
+  place_hold(id: string, force: string) {
+    var params = new HttpParams()
+      .set("token", this.token)
+      .set("id", id)
+      .set("v", "5");
+    if (force == 'true') { params = params.append("force", "true"); }
+    let url = this.globals.catalog_place_hold_url;
+    this.globals.loading_show();
+    this.http.get(url, {params: params})
+      .subscribe((data: any) => {
+        this.globals.api_loading = false;
+        if (data['user'] && data['hold']) {
+          if (data['hold']['need_to_force'] == true) {
+            this.force_needed(data['hold']['id'], data['hold']['error']);
+          } else if (data['hold']['error']) {
+            this.toast.presentToast(data['hold']['error'] + ' : ' + data['hold']['confirmation']);
+          } else {
+            this.toast.presentToast(data['hold']['confirmation'], 5000);
+            this.update_user_object(data['user']);
+            this.events.publish('hold_placed')
+          }
+        }
+        this.get_holds()
+      },
+      (err) => {
+        if (this.action_retry == true) {
+          this.globals.api_loading = false;
+          this.toast.presentToast(this.globals.server_error_msg);
+        } else {
+          this.globals.api_loading = false;
+          this.action_retry = true;
+          let subscription = this.events.subscribe('action_retry', () => {
+            this.place_hold(id, force);
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
+  }
+
+  async force_needed(id: string, error: string) {
+    const alert = await this.alertController.create({
+      header: 'Force hold?',
+      message: error,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        }, {
+          text: 'Force Hold',
+          handler: () => {
+            this.place_hold(id, "true");
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   manage_hold(hold: any, task: string) {
