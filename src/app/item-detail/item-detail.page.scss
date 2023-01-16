@@ -1,0 +1,41 @@
+h2.detail-title {
+  margin: 8px 0px 0px 8px;
+  padding: 0;
+}
+.detail-cover-image {
+  margin: 0;
+  padding: 0px 8px 8px 0px;
+}
+.detail-author {
+  margin: 0;
+  padding: 0px 4px 8px 0px;
+}
+.detail-description {
+  margin: 0;
+  padding: 0px 4px 8px 0px;
+}
+.detail-contents,
+.detail-publisher,
+.detail-description,
+.detail-electronic,
+.detail-availability {
+  margin: 0;
+  padding: 4px;
+}
+.detail-hold,
+.detail-checkout {
+  margin: 16px;
+  padding: 0px;
+}
+ion-icon {
+  vertical-align: middle;
+}
+ion-card-content {
+  padding-top: 4px;
+}
+.small-text {
+  font-size: 14px;
+}
+ion-card-header {
+  padding: 20px 4px 4px 20px;
+}

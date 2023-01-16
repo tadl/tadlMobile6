@@ -91,27 +91,29 @@
         </ion-item>
       </ion-list>
     </form>
-    <ion-item *ngFor="let result of results">
-      <ion-thumbnail slot="start">
-        <ion-img [src]="globals.catalog_covers_medium + result.id"></ion-img>
-      </ion-thumbnail>
-      <ion-label>
-        <ion-text>
-          <h2 [innerHTML]="result.title_display"></h2>
-        </ion-text>
-        <ion-text>
-          <p [innerHTML]="result.author_brief"><p>
-        </ion-text>
-        <ion-text>
-          <p>
-            <ion-icon [name]="globals.item_type.get(result.type_of_resource)"></ion-icon>
-            <ion-text *ngIf="!result.electronic" [color]="(result.availability.copies_all_available > 0) ? 'primary' : 'dark'"> {{ result.availability.copies_all_available }} available </ion-text>
-            <ion-text color="dark" *ngIf="!result.electronic"> / {{ result.holdings[0].call_number }} </ion-text>
-            <ion-text color="dark" *ngIf="result.electronic"> Electronic resource from {{ result.source }} </ion-text>
-          </p>
-        </ion-text>
-      </ion-label>
-    </ion-item>
+    <ion-list>
+      <ion-item *ngFor="let result of results" role="article" (click)="details(result)">
+        <ion-thumbnail slot="start">
+          <ion-img [src]="globals.catalog_covers_medium + result.id"></ion-img>
+        </ion-thumbnail>
+        <ion-label>
+          <ion-text>
+            <h2 [innerHTML]="result.title_display"></h2>
+          </ion-text>
+          <ion-text>
+            <p [innerHTML]="result.author_brief"><p>
+          </ion-text>
+          <ion-text>
+            <p>
+              <ion-icon [name]="globals.item_type.get(result.type_of_resource)"></ion-icon>
+              <ion-text *ngIf="!result.electronic" [color]="(result.availability.copies_all_available > 0) ? 'primary' : 'dark'"> {{ result.availability.copies_all_available }} available </ion-text>
+              <ion-text color="dark" *ngIf="!result.electronic"> / {{ result.holdings[0].call_number }} </ion-text>
+              <ion-text color="dark" *ngIf="result.electronic"> Electronic resource from {{ result.source }} </ion-text>
+            </p>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
   </div>
 
   <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">

@@ -29,9 +29,7 @@ export class SearchPage implements OnInit {
   limit_physical: boolean = false;
   results: any = [];
   new_results: any = [];
-  more_results: boolean;
-  infinite: any;
-  loading_more: boolean = false;
+  more_results: boolean = false;
   subscription: any;
 
   constructor(
@@ -74,7 +72,11 @@ export class SearchPage implements OnInit {
         this.prev_query = this.query;
         if (data) {
           if (JSON.parse(JSON.stringify(data))["type"]) { this.type = JSON.parse(JSON.stringify(data))["type"]; }
-          /* if (data["more_results"]) { this.more_results = data["more_results"]; } TODO: make this work potentially by defining the type of each returned json key/value (!!!) */
+          if (JSON.parse(JSON.stringify(data))["more_results"]) {
+            this.more_results = true;
+          } else {
+            this.more_results = false;
+          }
           this.new_results = JSON.parse(JSON.stringify(data))["results"];
           if (more == true) {
             for (let i = 0; i < this.new_results.length; i++) {
@@ -84,6 +86,7 @@ export class SearchPage implements OnInit {
             this.results = this.new_results;
           }
           //console.log(this.results);
+          //console.log(this.more_results);
         } else {
           this.toast.presentToast(this.globals.server_error_msg);
         }
@@ -100,16 +103,48 @@ export class SearchPage implements OnInit {
     }
   }
 
+  async details(item:any) {
+    this.subscription.unsubscribe();
+    const modal = await this.modalController.create({
+      component: ItemDetailPage,
+      componentProps: {
+        "item": item,
+      }
+    });
+    modal.onDidDismiss().then((dataReturned) => {
+      if (dataReturned !== null) {
+        console.log('Modal sent data: ', dataReturned);
+        this.subscription = this.platform.backButton.subscribe(() => {
+          this._location.back();
+        });
+      }
+    });
+    return await modal.present();
+  }
 
   ngOnInit() {
   }
 
   onIonInfinite(ev:any) {
-    this.page++;
-    this.get_results(this.page, true);
-    setTimeout(() => {
-      (ev as InfiniteScrollCustomEvent).target.complete();
-    }, 500);
+    if (this.more_results) {
+      this.page++;
+      this.get_results(this.page, true);
+      setTimeout(() => {
+        (ev as InfiniteScrollCustomEvent).target.complete();
+      }, 500);
+    } else {
+      (ev as InfiniteScrollCustomEvent).target.disabled = true;
+    }
+  }
+
+  ionViewDidEnter() {
+    this.subscription = this.platform.backButton.subscribe(() => {
+      this._location.back();
+    });
+  }
+
+  ionViewWillLeave() {
+    this.subscription.unsubscribe();
   }
 
 }
