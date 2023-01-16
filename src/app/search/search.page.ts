@@ -44,7 +44,7 @@ export class SearchPage implements OnInit {
   ) { }
 
   get_results(page?:number, more?:boolean) {
-    if (!this.query) { return; }
+    if (!this.query) { this.query = ''}
     if (this.type == "keyword") {
       this.sort = this.globals.sort_options[0][1];
     }

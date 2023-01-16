@@ -141,6 +141,8 @@ export class Globals {
     'Movies / TV',
     'Music',
     'Video Games',
+    'STEM Kits',
+    'Library of Things',
   ];
 
   item_type = new Map<string, string>([
