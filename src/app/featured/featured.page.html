@@ -18,7 +18,60 @@
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
+  <div *ngIf="this.results==''">
+    <div *ngIf="item.featured">
+      <ion-segment [(ngModel)]="item.media_type">
+        <ion-segment-button *ngFor="let key of item.featured_keys" [value]="key">
+          <ion-label style="font-size:16px;" padding>{{ key }}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+      <div [ngSwitch]="item.media_type">
+        <ion-grid *ngFor="let key of item.featured_keys" no-margin no-padding>
+          <ion-row *ngSwitchCase="key" no-margin no-padding>
+            <ion-col size="6" *ngFor="let search of item.featured[key]">
+              <img [src]="globals.catalog_square_covers_url + search.title + '_box.jpg'" (click)="featured_search(search.search_link, search.nice_title)">
+              <ion-button (click)="featured_search(search.search_link, search.nice_title)" expand="full" [color]="(this.search_title == search.nice_title) ? 'primary' : 'light'">
+                {{ search.nice_title }}
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </div>
+  </div>
+  <h2 *ngIf="!item.media_type" text-center>Pick a category to get started</h2>
+  <div *ngIf="results">
+    <ion-item-divider (click)="this.results='';this.search_title='cats'">
+      <ion-label>{{ this.search_title }}</ion-label>
+      <ion-icon name="close" slot="end"></ion-icon>
+    </ion-item-divider>
+    <ion-item *ngFor="let result of this.results" (click)="details(result)">
+      <ion-thumbnail slot="start">
+        <ion-img [src]="globals.catalog_covers_medium + result.id"></ion-img>
+      </ion-thumbnail>
+      <ion-label>
+        <ion-text>
+          <h2 [innerHTML]="result.title_display"></h2>
+        </ion-text>
+        <ion-text>
+          <p [innerHTML]="result.author_brief"><p>
+        </ion-text>
+        <ion-text>
+          <p>
+            <ion-icon [name]="globals.item_type.get(result.type_of_resource)"></ion-icon>
+            <ion-text *ngIf="!result.electronic" [color]="(result.availability.copies_all_available > 0) ? 'primary' : 'dark'"> {{ result.availability.copies_all_available }} available</ion-text>
+            <ion-text color="dark" *ngIf="!result.electronic"> / {{ result.holdings[0].call_number }}</ion-text>
+            <ion-text color="dark" *ngIf="result.electronic"> Electronic resource from {{ result.source }}</ion-text>
+          </p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="get_more_items($event)">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more items ...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
   </div>
 
 </ion-content>
