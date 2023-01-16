@@ -25,7 +25,9 @@
         <ion-item-option color="danger" (click)="user.cancel_hold(hold)">Cancel</ion-item-option>
       </ion-item-options>
       <ion-item>
-        <ion-img slot="start" [src]="globals.catalog_covers_medium + hold.id" (click)="details(hold)"></ion-img>
+        <ion-thumbnail slot="start">
+          <ion-img [src]="globals.catalog_covers_medium + hold.id" (click)="details(hold)"></ion-img>
+        </ion-thumbnail>
         <ion-label (click)="details(hold)">
           <h2><ion-text [innerHTML]="hold.title_display"></ion-text></h2>
           <ion-text>
