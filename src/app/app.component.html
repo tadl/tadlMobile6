@@ -4,7 +4,7 @@
       <ion-content>
         <ion-list id="nav-list">
           <ion-list-header>Main Menu</ion-list-header>
-          <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
+          <ion-menu-toggle auto-hide="true" *ngFor="let p of appPages; let i = index">
             <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
               <ion-icon slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
               <ion-label>{{ p.title }}</ion-label>
@@ -34,24 +34,24 @@
                 <h3>{{user.full_name}}</h3>
               </ion-label>
             </ion-item>
-            <ion-item routerDirection="root" routerLink="/checkouts" [disabled]="user.checkout_count == '0'">
+            <ion-item routerDirection="root" routerLink="/checkouts" [disabled]="user.checkout_count == '0'" (click)="globals.toggleMenu('end')">
               <ion-label>Checkouts</ion-label>
               <ion-badge slot="end">{{user.checkout_count}}</ion-badge>
             </ion-item>
-            <ion-item [disabled]="user.holds_count == '0'" routerLink="/holds">
+            <ion-item [disabled]="user.holds_count == '0'" routerLink="/holds" (click)="globals.toggleMenu('end')">
               <ion-label>Holds</ion-label>
               <ion-badge slot="end">{{ user.holds_count }}</ion-badge>
             </ion-item>
-            <ion-item [disabled]="user.holds_ready_count == '0'" routerLink="/holds">
+            <ion-item [disabled]="user.holds_ready_count == '0'" routerLink="/holds" (click)="globals.toggleMenu('end')">
               <ion-label>Holds Ready for Pickup</ion-label>
               <ion-badge slot="end">{{ user.holds_ready_count }}</ion-badge>
             </ion-item>
-            <ion-item routerDirection="root" [disabled]="!user.fines_exist">
+            <ion-item routerDirection="root" [disabled]="!user.fines_exist" (click)="globals.toggleMenu('end')">
               <ion-label>Fines</ion-label>
               <ion-badge slot="end">${{ user.fines_amount }}</ion-badge>
             </ion-item>
             <ion-button (click)="show_card(true)" expand="full" color="success">Show Card</ion-button>
-            <ion-button expand="full" color="danger" (click)="this.user.confirm_logout()">Logout</ion-button>
+            <ion-button expand="full" color="danger" (click)="this.user.confirm_logout();">Logout</ion-button>
           </div>
         </ion-list>
       </ion-content>

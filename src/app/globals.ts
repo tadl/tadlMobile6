@@ -230,6 +230,11 @@ export class Globals {
     this.menuController.open('end');
   }
 
+  /* toggle account menu */
+  toggleMenu(menu:string) {
+    this.menuController.toggle(menu);
+  }
+
   /* closes modals */
   async close_modal() {
     const onClosedData: string = "Wrapped up!";

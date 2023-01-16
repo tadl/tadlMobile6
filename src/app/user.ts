@@ -5,8 +5,9 @@ import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular
 import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
 import { Storage } from '@ionic/storage-angular';
-import {Events} from './event_service'
+import { Events } from './event_service'
 import { ToastService } from './services/toast.service';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 
@@ -44,6 +45,7 @@ export class User {
     private http: HttpClient,
     private zone: NgZone,
     private storage: Storage,
+    private router: Router,
   ){ }
 
   async login(saved: boolean) {
@@ -135,6 +137,7 @@ export class User {
     let params = new HttpParams()
     .set("token", this.token)
     .set("v", "5");
+    this.router.navigate(['/home']);
     this.http.get('https://apiv4.catalog.tadl.org/logout.json', {params: params})
     .subscribe({
       next: (response) => this.clear_user(response),
