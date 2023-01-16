@@ -33,7 +33,9 @@ export class User {
   fines: any;
   action_retry: any;
   preferences: any;
-  item:{};
+  item: any = {};
+  stored_accounts: any = {};
+  stored_accounts_keys: Array<string> = [];
 
   constructor(
     public actionSheetController: ActionSheetController,
@@ -67,6 +69,36 @@ export class User {
         next: (response) => this.load_user_data(response),
         error: (error) => this.show_error_message("Could not reach login server. Please verify you have a data connection or try again later."),
       });
+  }
+
+  login_as(id:string) {
+    this.username = this.stored_accounts[id]['username'];
+    this.hashed_password = this.stored_accounts[id]['hashed_password'];
+    this.login(true);
+  }
+
+  switch_user() {
+    this.update_stored_accounts();
+    this.logout(true);
+  }
+
+  update_stored_accounts() {
+    this.storage.get('stored_accounts').then((data) => {
+      if (data) {
+        this.stored_accounts = JSON.parse(data);
+        this.stored_accounts_keys = Object.keys(this.stored_accounts);
+      }
+    });
+    if (this.id) {
+      let user = {
+        hashed_password: this.hashed_password,
+        username: this.username,
+        full_name: this.full_name,
+      };
+      this.stored_accounts[this.id] = user;
+      this.storage.set('stored_accounts', JSON.stringify(this.stored_accounts));
+      this.stored_accounts_keys = Object.keys(this.stored_accounts);
+    }
   }
 
   async show_error_message(message = '') {
@@ -132,18 +164,39 @@ export class User {
     await actionSheet.present();
   }
 
-  logout() {
+  logout(token_only?:boolean) {
     console.log('trying to logout...');
     let params = new HttpParams()
     .set("token", this.token)
     .set("v", "5");
-    this.router.navigate(['/home']);
-    this.http.get('https://apiv4.catalog.tadl.org/logout.json', {params: params})
+    this.http.get(this.globals.catalog_logout_url, {params: params})
+    .subscribe((data:any) => {
+      this.globals.api_loading = false;
+      if (JSON.parse(JSON.stringify(data))["success"] || JSON.parse(JSON.stringify(data))["error"] == "not logged in or invalid token") {
+        if (token_only == false) {
+          delete this.stored_accounts[this.id];
+          this.stored_accounts_keys = Object.keys(this.stored_accounts);
+          this.storage.set('stored_accounts', JSON.stringify(this.stored_accounts));
+        } else {}
+        this.zone.run(() => {
+          this.clear_user();
+          this.router.navigate(['/home']);
+        });
+      }
+    },
+    (err) => {
+      this.toast.presentToast(this.globals.server_error_msg);
+    });
+  }
+    /*
+
+    JSON.parse(JSON.stringify(data))["type"]
+
     .subscribe({
       next: (response) => this.clear_user(response),
       error: (error) => this.show_error_message("Could not reach login server. Please verify you have a data connection or try again later."),
-    })
-  }
+    }) */
+    //this.router.navigate(['/home']);
 
   autolog() {
     console.log('trying to auto login...');
