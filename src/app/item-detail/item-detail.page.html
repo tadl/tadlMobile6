@@ -98,7 +98,7 @@
     </ion-grid>
   
     <div *ngIf="item.electronic != true" class="copy-details">
-      <div padding>
+      <div class="ion-padding">
         <ion-segment [(ngModel)]="items">
           <ion-segment-button value="Available">
             Available Copies
@@ -117,7 +117,7 @@
           <div *ngFor="let location of item.availability.by_location">
             <div *ngIf="location.copies_available > 0">
               <ion-item-divider *ngIf="globals.multi_location == true">{{ globals.short_to_friendly_name.get(location.name_compact) }}</ion-item-divider>
-              <ion-item *ngFor="let shelf of location.shelving_locations" text-wrap>
+              <ion-item *ngFor="let shelf of location.shelving_locations" class="ion-text-wrap">
                 {{ shelf.available_copies }} in {{ shelf.shelving_location }}
                 <ion-badge slot="end">{{ shelf.call_number }}</ion-badge>
               </ion-item>
@@ -128,22 +128,22 @@
           <ion-item *ngIf="item.availability.copies_all != 0">
             <ion-grid>
               <ion-row>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">Location</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">Shelf</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">Shelf/Call Num</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">Call Num</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4"><ion-text class="small-text">Status</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">Location</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">Shelf</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">Shelf/Call Num</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">Call Num</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4"><ion-text class="small-text">Status</ion-text></ion-col>
               </ion-row>
             </ion-grid>
           </ion-item>
           <ion-item *ngFor="let copy of item.holdings">
             <ion-grid>
               <ion-row>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">{{ globals.short_to_friendly_name.get(copy.circ_lib) }}</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">{{ copy.location }}</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">{{ copy.location }} / {{ copy.call_number }}</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">{{ copy.call_number }}</ion-text></ion-col>
-                <ion-col class="detail" text-wrap size="4"><ion-text class="small-text">{{ copy.status }}<span *ngIf="copy.due_date"><br/>Due {{ copy.due_date }}</span></ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">{{ globals.short_to_friendly_name.get(copy.circ_lib) }}</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">{{ copy.location }}</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location == true"><ion-text class="small-text">{{ copy.location }} / {{ copy.call_number }}</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4" *ngIf="globals.multi_location != true"><ion-text class="small-text">{{ copy.call_number }}</ion-text></ion-col>
+                <ion-col class="detail ion-text-wrap" size="4"><ion-text class="small-text">{{ copy.status }}<span *ngIf="copy.due_date"><br/>Due {{ copy.due_date }}</span></ion-text></ion-col>
               </ion-row>
             </ion-grid>
           </ion-item>
