@@ -34,7 +34,7 @@
                 <h3>{{user.full_name}}</h3>
               </ion-label>
             </ion-item>
-            <ion-item routerDirection="root" routerLink="/checkouts" [disabled]="user.checkout_count == '0'" (click)="globals.toggleMenu('end')">
+            <ion-item routerLink="/checkouts" [disabled]="user.checkout_count == '0'" (click)="globals.toggleMenu('end')">
               <ion-label>Checkouts</ion-label>
               <ion-badge slot="end">{{user.checkout_count}}</ion-badge>
             </ion-item>
