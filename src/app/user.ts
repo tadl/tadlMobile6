@@ -4,7 +4,7 @@ import { ModalController, ActionSheetController, AlertController, NavController}
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
-import { Storage } from '@ionic/storage-angular';
+import { Storage } from '@ionic/storage';
 import { Events } from './event_service'
 import { ToastService } from './services/toast.service';
 import { Router } from '@angular/router';
@@ -50,7 +50,7 @@ export class User {
     private router: Router,
   ){ }
 
-  async login(saved: boolean) {
+  async login(saved: boolean = false) {
     if (saved != true) {
       if (!this.username || !this.password) {
         this.show_error_message("Username and password are required.");
@@ -84,10 +84,8 @@ export class User {
 
   update_stored_accounts() {
     this.storage.get('stored_accounts').then((data) => {
-      if (data) {
-        this.stored_accounts = JSON.parse(data);
-        this.stored_accounts_keys = Object.keys(this.stored_accounts);
-      }
+      this.stored_accounts = JSON.parse(data);
+      this.stored_accounts_keys = Object.keys(this.stored_accounts);
     });
     if (this.id) {
       let user = {
@@ -107,23 +105,22 @@ export class User {
   }
 
   async load_user_data(data: any={}) {
-    console.log(data);
     if (data.error) {
       this.show_error_message("Invalid username and/or password. Please try again.");
     } else {
+      this.update_stored_accounts();
       this.update_user_object(data);
-      this.process_checkouts(data)
-      this.process_holds(data)
+      this.process_checkouts(data);
+      this.process_holds(data);
     }
     this.globals.api_loading = false;
   }
 
-  async update_user_object(data : any={}) {
+  async update_user_object(data: any = {}) {
     //not all API calls return the full user so check to see and if not fetch the user
-    if(data['user']['checkouts'] == null){
-      console.log('full user not returned fetching user...')
+    if (data['user']['checkouts'] == null) {
       this.login(true);
-      return 
+      return;
     }
     this.token = data['user']['token'];
     this.full_name = data['user']['full_name'];
@@ -140,8 +137,8 @@ export class User {
     this.storage.set('username', this.username);
     this.storage.set('hashed_password', this.hashed_password);
     this.globals.api_loading = false;
-    if(this.logged_in == false){
-      this.logged_in = true
+    if (this.logged_in == false) {
+      this.logged_in = true;
       this.events.publish('logged in');
     }
   }
@@ -153,7 +150,7 @@ export class User {
         text: 'Log Out',
         role: 'destructive',
         handler: () => {
-          this.logout();
+          this.logout(false);
         }
       }, {
         text: 'Cancel',
@@ -166,7 +163,6 @@ export class User {
   }
 
   logout(token_only?:boolean) {
-    console.log('trying to logout...');
     let params = new HttpParams()
     .set("token", this.token)
     .set("v", "5");
@@ -191,7 +187,6 @@ export class User {
   }
 
   autolog() {
-    console.log('trying to auto login...');
     this.storage.get('username').then((val: string) => {
       if (val) {
         this.username = val;
@@ -206,7 +201,6 @@ export class User {
   }
 
   clear_user(data : any={}) {
-    console.log('trying to clear user...');
     this.logged_in = false;
     this.username = '';
     this.password = '';
@@ -233,7 +227,6 @@ export class User {
 
   get_checkouts(){
     if(this.logged_in){
-      console.log('trying to get checkouts...');
       let params = new HttpParams()
       .set("token", this.token)
       .set("v", "5");
@@ -310,7 +303,6 @@ export class User {
 
   get_holds(){
     if(this.logged_in){
-      console.log('trying to get holds...');
       this.globals.loading_show();
       let params = new HttpParams()
       .set("token", this.token)
@@ -343,7 +335,6 @@ export class User {
     await this.modalController.dismiss(onClosedData);
     this.globals.open_account_menu();
     const subscription = this.events.subscribe('logged in', () => {
-      console.log('I think you logged in')
       this.place_hold(id, 'false');
       subscription.unsubscribe();
     });
