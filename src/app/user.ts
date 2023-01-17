@@ -189,15 +189,6 @@ export class User {
       this.toast.presentToast(this.globals.server_error_msg);
     });
   }
-    /*
-
-    JSON.parse(JSON.stringify(data))["type"]
-
-    .subscribe({
-      next: (response) => this.clear_user(response),
-      error: (error) => this.show_error_message("Could not reach login server. Please verify you have a data connection or try again later."),
-    }) */
-    //this.router.navigate(['/home']);
 
   autolog() {
     console.log('trying to auto login...');
