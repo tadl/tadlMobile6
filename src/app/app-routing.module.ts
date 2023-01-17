@@ -55,6 +55,10 @@ const routes: Routes = [
     path: 'preferences',
     loadChildren: () => import('./preferences/preferences.module').then( m => m.PreferencesPageModule)
   },
+  {
+    path: 'fines',
+    loadChildren: () => import('./fines/fines.module').then( m => m.FinesPageModule)
+  },
 ];
 
 @NgModule({

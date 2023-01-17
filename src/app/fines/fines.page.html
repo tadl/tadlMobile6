@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-progress-bar *ngIf="globals.api_loading" type="indeterminate"></ion-progress-bar>
+    <ion-title>Current Fines and Fees</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button menu="end"><ion-icon name="person-circle"></ion-icon></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="user.fines_exist && user.fines">
+    <ion-list lines="full">
+      <ion-item-divider>
+        <ion-label>Fines</ion-label>
+      </ion-item-divider>
+      <ion-item *ngFor="let fine of user.fines['fines']">
+        <ion-label color="dark">
+          <p>Title: {{ fine.title }}</p>
+          <p>Checkout: {{ fine.checkout_date }}</p>
+          <p>Due: {{ fine.due_date }}</p>
+        </ion-label>
+        <ion-note slot="end" color="dark">{{ fine.balance_owed }}</ion-note>
+      </ion-item>
+
+      <ion-item-divider>
+        <ion-label>Fees</ion-label>
+      </ion-item-divider>
+      <ion-item *ngFor="let fee of user.fines['fees']">
+        <ion-label color="dark">
+          <p>Type: {{ fee.billing_type }}</p>
+          <p>Date: {{ fee.transaction_start_date }}</p>
+          <p>Paid: {{ fee.total_amt_paid }}</p>
+        </ion-label>
+        <ion-note slot="end" color="dark">{{ fee.balance_owed }}</ion-note>
+      </ion-item>
+
+      <ion-item-divider>
+        <ion-label>Summary</ion-label>
+      </ion-item-divider>
+      <ion-item>
+        <ion-label color="dark">Total Owed</ion-label>
+        <ion-note slot="end" color="dark">${{ user.fines_amount }}</ion-note>
+      </ion-item>
+      <ion-button expand="full" (click)="this.globals.open_page(globals.pay_fines_url)">Pay Fines</ion-button>
+    </ion-list>
+  </div>
+
+  <div *ngIf="(!user.fines_exist && !user.logged_in) || (user.fines_exist && !user.logged_in)">
+    <p margin>Fines are loading. One moment...</p>
+  </div>
+
+  <div *ngIf="!user.fines_exist && user.logged_in">
+    <p margin>You have no fines on your account. Hooray!</p>
+  </div>
+
+</ion-content>

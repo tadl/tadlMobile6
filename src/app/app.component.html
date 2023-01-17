@@ -46,7 +46,7 @@
               <ion-label>Holds Ready for Pickup</ion-label>
               <ion-badge slot="end">{{ user.holds_ready_count }}</ion-badge>
             </ion-item>
-            <ion-item routerDirection="root" [disabled]="!user.fines_exist" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
+            <ion-item routerDirection="root" routerLink="/fines" [disabled]="!user.fines_exist" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
               <ion-label>Fines</ion-label>
               <ion-badge slot="end">${{ user.fines_amount }}</ion-badge>
             </ion-item>

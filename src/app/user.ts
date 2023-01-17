@@ -594,5 +594,34 @@ export class User {
       });
   }
 
+  get_fines() {
+    let params = new HttpParams()
+      .set("token", this.token)
+      .set("v", "5");
+    let url = this.globals.catalog_fines_url;
+    this.globals.loading_show();
+    this.http.get(url, {params: params})
+      .subscribe(data => {
+        this.globals.api_loading = false;
+        if (data) {
+          this.fines = data;
+        }
+      },
+      (err) => {
+        this.globals.api_loading = false;
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          let subscription = this.events.subscribe('action_retry', () => {
+            this.get_fines();
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
+  }
+
 
 }
