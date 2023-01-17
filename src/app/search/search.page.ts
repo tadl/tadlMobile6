@@ -133,7 +133,9 @@ export class SearchPage implements OnInit {
         (ev as InfiniteScrollCustomEvent).target.complete();
       }, 500);
     } else {
-      (ev as InfiniteScrollCustomEvent).target.disabled = true;
+      setTimeout(() => {
+        (ev as InfiniteScrollCustomEvent).target.complete();
+      }, 10);
     }
   }
 
