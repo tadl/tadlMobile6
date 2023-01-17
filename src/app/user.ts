@@ -111,7 +111,7 @@ export class User {
     if (data.error) {
       this.show_error_message("Invalid username and/or password. Please try again.");
     } else {
-      this.update_user_object(data.user);
+      this.update_user_object(data);
       this.process_checkouts(data)
       this.process_holds(data)
     }
@@ -120,22 +120,23 @@ export class User {
 
   async update_user_object(data : any={}) {
     //not all API calls return the full user so check to see and if not fetch the user
-    if(data['checkouts'] == null){
+    if(data['user']['checkouts'] == null){
       console.log('full user not returned fetching user...')
       this.login(true);
       return 
     }
-    this.token = data['token'];
-    this.full_name = data['full_name'];
-    this.checkout_count = data['checkouts'];
-    this.holds_count = data['holds'];
-    this.holds_ready_count = data['holds_ready'];
-    this.fines_amount = data['fine'];
-    this.id = data['melcat_id'];
+    this.token = data['user']['token'];
+    this.full_name = data['user']['full_name'];
+    this.preferences = data['preferences'];
+    this.checkout_count = data['user']['checkouts'];
+    this.holds_count = data['user']['holds'];
+    this.holds_ready_count = data['user']['holds_ready'];
+    this.fines_amount = data['user']['fine'];
+    this.id = data['user']['melcat_id'];
     if (parseFloat(this.fines_amount) != parseFloat('0.00')) { this.fines_exist = true; }
-    this.card = data['card'];
-    this.overdue = data['overdue'];
-    this.default_pickup = data['pickup_library'];
+    this.card = data['user']['card'];
+    this.overdue = data['user']['overdue'];
+    this.default_pickup = data['user']['pickup_library'];
     this.storage.set('username', this.username);
     this.storage.set('hashed_password', this.hashed_password);
     this.globals.api_loading = false;
@@ -334,7 +335,7 @@ export class User {
 
   process_holds(data: any) {
     this.globals.api_loading = false;
-    this.update_user_object(data['user'])
+    this.update_user_object(data)
     data = data['holds']
     let existing = this.holds.map(item => item['hold_id'] + item['hold_status'] + item['queue_status'] + item['queue_state'][0] + item['queue_state'][1] + item['pickup_location_code']).join();
     let newdata = data.map((item: any) => item['hold_id'] + item['hold_status'] + item['queue_status'] + item['queue_state'][0] + item['queue_state'][1] + item['pickup_location_code']).join();
@@ -375,7 +376,7 @@ export class User {
             this.toast.presentToast(data['hold']['error'] + ' : ' + data['hold']['confirmation']);
           } else {
             this.toast.presentToast(data['hold']['confirmation'], 5000);
-            this.update_user_object(data['user']);
+            this.update_user_object(data);
             this.events.publish('hold_placed')
           }
         }
@@ -432,7 +433,7 @@ export class User {
         this.globals.api_loading = false;
         if (data['holds'] && data['user']) {
           this.process_holds(data);
-          this.update_user_object(data['user']);
+          this.update_user_object(data);
           this.toast.presentToast("Successfully " + action + " hold on " + hold.title_display + ".", 5000);
         }
         this.events.publish('manage_hold_complete');
@@ -510,7 +511,7 @@ export class User {
   process_checkouts(data: any={}) {
     this.globals.api_loading = false;
     let date_today = format(new Date(), 'MM/dd/yyyy');
-    this.update_user_object(data['user'])
+    this.update_user_object(data)
     data = data['checkouts']
     data.forEach(function(checkout: any={} , index = 0) {
       if (isBefore(new Date(checkout['due_date']), new Date(date_today)) && !isSameDay(new Date(checkout['due_date']), new Date(date_today))) {
@@ -533,6 +534,64 @@ export class User {
       });
     }
     this.events.publish('process_checkouts_complete');
+  }
+
+  update_preferences(params: any, password: any) {
+    this.globals.loading_show();
+    let url = this.globals.catalog_update_preferences_url;
+    this.http.get(url, {params: params})
+      .subscribe((data: any) => {
+        this.globals.api_loading = false;
+        this.update_user_object(data);
+        this.preferences = data['preferences'];
+        if (password) {
+          this.hashed_password = Md5.hashStr(password);
+        }
+      },
+      (err) => {
+        this.globals.api_loading = false;
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          let subscription = this.events.subscribe('action_retry', () => {
+            this.update_preferences(params, null);
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
+  }
+
+  get_preferences() {
+    let params = new HttpParams()
+      .set("token", this.token)
+      .set("v", "5");
+    let url = this.globals.catalog_preferences_url;
+    this.globals.loading_show();
+    this.http.get(url, {params: params})
+      .subscribe((data: any) => {
+        this.globals.api_loading = false;
+        if (data) {
+          this.update_user_object(data);
+          this.preferences = data['preferences'];
+        }
+      },
+      (err) => {
+        this.globals.api_loading = false;
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          let subscription = this.events.subscribe('action_retry', () => {
+            this.action_retry = false;
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
   }
 
 

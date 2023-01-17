@@ -1,0 +1,84 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-progress-bar *ngIf="globals.api_loading" type="indeterminate"></ion-progress-bar>
+    <ion-title>Account Preferences</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button menu="end"><ion-icon name="person-circle"></ion-icon></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="user.preferences">
+    <ion-item-divider>
+      <ion-label>Circulation Preferences</ion-label>
+    </ion-item-divider>
+    <ion-item>
+      <ion-label>Pickup Library</ion-label>
+      <ion-select class="full-width-select" interface="popover" [(ngModel)]="user.preferences.pickup_library" (ionChange)="update_hold_pickup_location($event)">
+        <ion-select-option *ngFor="let location of globals.pickup_locations" [value]="location.code">{{ location.name }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Default Search Location</ion-label>
+      <ion-select class="full-width-select" interface="popover" [(ngModel)]="user.preferences.default_search" (ionChange)="update_default_search_location($event)">
+        <ion-select-option *ngFor="let location of globals.search_locations" [value]="location.code">{{ location.name }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Keep Circulation History</ion-label>
+      <ion-toggle [(ngModel)]="user.preferences.keep_circ_history" (ionChange)="toggle_circ_history($event)"></ion-toggle>
+    </ion-item>
+    <ion-item-divider>
+      <ion-label>User Preferences</ion-label>
+    </ion-item-divider>
+    <ion-item (click)="update_username()">
+      <ion-label>Username</ion-label>
+      {{ user.preferences.username }}
+    </ion-item>
+    <ion-item (click)="update_alias()">
+      <ion-label>Holdshelf Alias</ion-label>
+      {{ user.preferences.hold_shelf_alias }}
+    </ion-item>
+    <ion-item (click)="update_email()">
+      <ion-label>Email Address</ion-label>
+      {{ user.preferences.email }}
+    </ion-item>
+    <ion-item (click)="update_password()">
+      <ion-label>Password</ion-label>
+      (not displayed)
+    </ion-item>
+    <ion-item-divider>
+      <ion-label>Notification Preferences</ion-label>
+    </ion-item-divider>
+    <ion-item (click)="update_phone_notify_number()">
+      <ion-label>Phone Notify Number</ion-label>
+      {{ user.preferences.phone_notify_number }}
+    </ion-item>
+    <ion-item (click)="update_text_notify_number()">
+      <ion-label>Text Notify Number</ion-label>
+      {{ user.preferences.text_notify_number }}
+    </ion-item>
+    <ion-item>
+      <ion-label>Email Notify</ion-label>
+      <ion-toggle id="email_notify" [(ngModel)]="user.preferences.email_notify" (ionChange)="toggle_notify_method($event)"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label>Phone Notify</ion-label>
+      <ion-toggle id="phone_notify" [(ngModel)]="user.preferences.phone_notify" (ionChange)="toggle_notify_method($event)"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label>Text Notify</ion-label>
+      <ion-toggle id="text_notify" [(ngModel)]="user.preferences.text_notify" (ionChange)="toggle_notify_method($event)"></ion-toggle>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<ion-content *ngIf="!user.logged_in" padding>
+  Preferences will load when you log in.
+</ion-content>
+<ion-content *ngIf="!user.preferences && user.logged_in" padding>
+  Preferences are loading.
+</ion-content>

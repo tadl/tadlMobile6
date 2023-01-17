@@ -51,6 +51,10 @@ const routes: Routes = [
     path: 'holds',
     loadChildren: () => import('./holds/holds.module').then( m => m.HoldsPageModule)
   },
+  {
+    path: 'preferences',
+    loadChildren: () => import('./preferences/preferences.module').then( m => m.PreferencesPageModule)
+  },
 ];
 
 @NgModule({
