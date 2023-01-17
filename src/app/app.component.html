@@ -42,6 +42,7 @@
               <ion-input type="password" [(ngModel)]="user.password"></ion-input>
             </ion-item>
             <ion-button  expand="full" color="success" (click)="this.user.login(false)">Login</ion-button>
+            <ion-button expand="full" fill="clear" routerDirection="root" routerLink="/password-reset">Trouble logging in?</ion-button>
           </div>
           <div *ngIf="user.logged_in == true">
             <ion-item>
