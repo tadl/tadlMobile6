@@ -16,6 +16,7 @@ import { ItemDetailPage } from '../item-detail/item-detail.page';
 export class CheckoutHistoryPage implements OnInit {
 
   subscription: any;
+  available: boolean = true;
 
   constructor(
     public globals: Globals,
@@ -52,7 +53,8 @@ export class CheckoutHistoryPage implements OnInit {
 
   ngOnInit() {
     if (this.user.token) {
-      this.user.get_preferences();
+      console.log(this.user.preferences.keep_circ_history);
+      this.available = this.user.preferences.keep_circ_history;
       this.user.get_checkout_history();
     }
   }

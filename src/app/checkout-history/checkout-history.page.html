@@ -26,10 +26,10 @@
     This page will update once you are logged in.
   </div>
   <div *ngIf="user.logged_in">
-    <div *ngIf="user.checkout_history.length == 0 && user.preferences.keep_circ_history == true" padding>
+    <div *ngIf="user.checkout_history.length == 0 && user.preferences['keep_circ_history'] == true" class="ion-padding">
       Checkout History is not yet loaded, or unavailable.
     </div>
-    <div *ngIf="user.preferences.keep_circ_history == false" padding>
+    <div *ngIf="user.preferences['keep_circ_history'] == false" class="ion-padding">
       Checkout History is not enabled on your account.
     </div>
   </div>

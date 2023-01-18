@@ -110,6 +110,7 @@ export class User {
     if (data.error) {
       this.show_error_message("Invalid username and/or password. Please try again.");
     } else {
+      console.log(data);
       this.update_stored_accounts();
       this.update_user_object(data);
       this.process_checkouts(data);
@@ -558,7 +559,6 @@ export class User {
       .subscribe((data: any) => {
         this.globals.api_loading = false;
         if (data) {
-          console.log(data['preferences']);
           this.update_user_object(data);
           this.preferences = data['preferences'];
         }
