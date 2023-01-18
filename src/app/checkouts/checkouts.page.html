@@ -48,10 +48,10 @@
       </ion-item>
     </ion-item-sliding>
   </div>
-  <div *ngIf="user.checkouts.length == 0 && user.checkout_count != '0'">
+  <div *ngIf="user.checkouts.length == 0 && user.checkout_count != 0">
     <p margin>Checkouts are loading. One moment.</p>
   </div>
-  <div *ngIf="user.checkout_count == '0'">
+  <div *ngIf="user.checkout_count == 0">
     <p margin>You have no items checked out.</p>
   </div>
 </ion-content>

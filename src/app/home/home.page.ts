@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Globals } from '../globals';
-import { ActivatedRoute } from '@angular/router';
+import { User } from '../user';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -12,6 +13,8 @@ export class HomePage implements OnInit {
 
   constructor(
     public globals: Globals,
+    public user: User,
+    private router: Router,
     private activatedRoute: ActivatedRoute,
     ) { }
 

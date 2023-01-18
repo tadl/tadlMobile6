@@ -52,10 +52,10 @@
       </ion-item>
     </ion-item-sliding>
   </div>
-  <div *ngIf="user.holds.length == 0 && user.holds_count != '0'">
+  <div *ngIf="user.holds.length == 0 && user.holds_count != 0">
     <p margin>Holds are loading. One moment...</p>
   </div>
-  <div *ngIf="user.holds_count == '0'">
+  <div *ngIf="user.holds_count == 0">
     <p margin>You have no items on hold.</p>
   </div>
 

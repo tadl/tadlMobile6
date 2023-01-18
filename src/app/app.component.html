@@ -50,15 +50,15 @@
                 <h3>{{user.full_name}}</h3>
               </ion-label>
             </ion-item>
-            <ion-item routerLink="/checkouts" [disabled]="user.checkout_count == '0'" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
+            <ion-item routerLink="/checkouts" [disabled]="user.checkout_count == 0" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
               <ion-label>Checkouts</ion-label>
               <ion-badge slot="end">{{user.checkout_count}}</ion-badge>
             </ion-item>
-            <ion-item [disabled]="user.holds_count == '0'" routerLink="/holds" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
+            <ion-item [disabled]="user.holds_count == 0" routerLink="/holds" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
               <ion-label>Holds</ion-label>
               <ion-badge slot="end">{{ user.holds_count }}</ion-badge>
             </ion-item>
-            <ion-item [disabled]="user.holds_ready_count == '0'" routerLink="/holds" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
+            <ion-item [disabled]="user.holds_ready_count == 0" routerLink="/holds" (click)="globals.toggleMenu('end')"  *ngIf="globals.net_status == 'online'">
               <ion-label>Holds Ready for Pickup</ion-label>
               <ion-badge slot="end">{{ user.holds_ready_count }}</ion-badge>
             </ion-item>

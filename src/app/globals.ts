@@ -242,11 +242,10 @@ export class Globals {
   }
 
   /* image error */
-  /* not yet
-  image_error(event:Array<string[]>) {
+  image_error(event:any = {}) {
+    console.log("image error! " + event.target.src);
     event.target.src = this.square_logo_url;
   }
-  */
 
   /* api loading indicator */
   loading_show() {
