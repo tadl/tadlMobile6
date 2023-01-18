@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Globals } from '../globals';
 import { User } from '../user';
-import {Events} from '../event_service'
+import { Events } from '../services/event.service';
 
 @Component({
   selector: 'app-item-detail',

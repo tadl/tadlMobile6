@@ -5,7 +5,7 @@ import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular
 import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
 import { Storage } from '@ionic/storage';
-import { Events } from './event_service'
+import { Events } from './services/event.service';
 import { ToastService } from './services/toast.service';
 import { Router } from '@angular/router';
 
@@ -36,6 +36,8 @@ export class User {
   item: any = {};
   stored_accounts: any = {};
   stored_accounts_keys: Array<string> = [];
+  checkout_history: Array<any> = [];
+  checkout_history_page: number = 0;
 
   constructor(
     public actionSheetController: ActionSheetController,
@@ -556,6 +558,7 @@ export class User {
       .subscribe((data: any) => {
         this.globals.api_loading = false;
         if (data) {
+          console.log(data['preferences']);
           this.update_user_object(data);
           this.preferences = data['preferences'];
         }
@@ -603,6 +606,26 @@ export class User {
           this.login(true);
         }
       });
+  }
+
+  get_checkout_history(page?:number) {
+    if (!page) { this.checkout_history_page = 0; }
+    let params = new HttpParams()
+      .set("token", this.token)
+      .set("v", "5")
+      .set("page", this.checkout_history_page);
+    let url = this.globals.catalog_checkout_history_url;
+    this.globals.loading_show();
+    this.http.get(url, {params: params}).subscribe(data => {
+      this.globals.api_loading = false;
+      if (JSON.parse(JSON.stringify(data))["user"] && JSON.parse(JSON.stringify(data))["checkouts"]) {
+        this.checkout_history = JSON.parse(JSON.stringify(data))["checkouts"];
+      }
+    },
+    (err) => {
+      this.globals.api_loading = false;
+      this.toast.presentToast(this.globals.server_error_msg);
+    });
   }
 
 

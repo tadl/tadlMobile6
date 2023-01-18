@@ -66,6 +66,9 @@
               <ion-label>Fines</ion-label>
               <ion-badge slot="end">${{ user.fines_amount }}</ion-badge>
             </ion-item>
+            <ion-item routerDirection="root" routerLink="/checkout-history" detail="true" (click)="globals.toggleMenu('end')" *ngIf="user.preferences.keep_circ_history && globals.net_status == 'online'">
+              <ion-label>Checkout History</ion-label>
+            </ion-item>
             <ion-item routerDirection="root" routerLink="/preferences" (click)="globals.toggleMenu('end')" *ngIf="globals.net_status == 'online'">
               <ion-label>Account Preferences</ion-label>
             </ion-item>

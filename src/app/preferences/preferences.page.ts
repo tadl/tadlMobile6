@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Events } from '../event_service'
+import { Events } from '../services/event.service';
 import { Platform, ActionSheetController, AlertController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';

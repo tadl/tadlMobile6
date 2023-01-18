@@ -1,0 +1,58 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-progress-bar *ngIf="globals.api_loading" type="indeterminate"></ion-progress-bar>
+    <ion-title>Checkout History</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button menu="end"><ion-icon name="person-circle"></ion-icon></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="refresh_checkout_history($event)">
+    <ion-refresher-content
+    pullingIcon="chevron-down-circle-outline"
+    pullingText="Pull to refresh"
+    refreshingSpinner="circles"
+    refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="!user.logged_in" class="ion-padding">
+    This page will update once you are logged in.
+  </div>
+  <div *ngIf="user.logged_in">
+    <div *ngIf="user.checkout_history.length == 0 && user.preferences.keep_circ_history == true" padding>
+      Checkout History is not yet loaded, or unavailable.
+    </div>
+    <div *ngIf="user.preferences.keep_circ_history == false" padding>
+      Checkout History is not enabled on your account.
+    </div>
+  </div>
+  <ion-list *ngIf="user.checkout_history.length > 0">
+    <ion-item *ngFor="let checkout of user.checkout_history" (click)="details(checkout)">
+      <ion-thumbnail slot="start">
+        <ion-img [src]="globals.catalog_covers_medium + checkout.id"></ion-img>
+      </ion-thumbnail>
+      <ion-label>
+        <ion-text>
+          <h2 [innerHTML]="checkout.title_display"></h2>
+        </ion-text>
+        <ion-text>
+          <p [innerHTML]="checkout.author_brief"></p>
+        </ion-text>
+        <ion-text>
+          <p>
+            <span *ngIf="checkout.checkout_date">Checked out {{ checkout.checkout_date }}</span>
+            <span *ngIf="checkout.return_date != '*'">, Returned {{ checkout.return_date }}</span>
+            <span *ngIf="checkout.due_date && checkout.return_date == '*'">, Due {{ checkout.due_date }}</span>
+          </p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

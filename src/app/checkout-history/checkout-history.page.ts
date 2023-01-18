@@ -1,28 +1,30 @@
 import { Component, OnInit } from '@angular/core';
+import { Platform, InfiniteScrollCustomEvent, ModalController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { Globals } from '../globals';
 import { User } from '../user';
-import { Platform, ModalController } from '@ionic/angular';
-import { ItemDetailPage } from '../item-detail/item-detail.page';
+import { Item } from '../item';
 import { Events } from '../services/event.service';
+import { ItemDetailPage } from '../item-detail/item-detail.page';
 
 @Component({
-  selector: 'app-checkouts',
-  templateUrl: './checkouts.page.html',
-  styleUrls: ['./checkouts.page.scss'],
+  selector: 'app-checkout-history',
+  templateUrl: './checkout-history.page.html',
+  styleUrls: ['./checkout-history.page.scss'],
 })
 
-export class CheckoutsPage implements OnInit {
+export class CheckoutHistoryPage implements OnInit {
 
   subscription: any;
 
   constructor(
-    public events: Events,
-    public modalController: ModalController,
     public globals: Globals,
     public user: User,
-    private _location: Location,
+    public item: Item,
+    public events: Events,
     private platform: Platform,
+    private _location: Location,
+    private modalController: ModalController,
   ) { }
 
   async details(item:any) {
@@ -44,19 +46,18 @@ export class CheckoutsPage implements OnInit {
     return await modal.present();
   }
 
-  refresh_checkouts(event: any) {
-    this.user.get_checkouts();
-    let subscription = this.events.subscribe('process_checkouts_complete', () => {
-      event.target.complete();
-      subscription.unsubscribe();
-    });
+  refresh_checkout_history(event:any) {
+    return;
   }
 
   ngOnInit() {
+    if (this.user.token) {
+      this.user.get_preferences();
+      this.user.get_checkout_history();
+    }
   }
 
   ionViewDidEnter() {
-    this.user.get_checkouts()
     this.subscription = this.platform.backButton.subscribe(() => {
       this._location.back();
     });

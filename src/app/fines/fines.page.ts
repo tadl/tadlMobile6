@@ -1,4 +1,4 @@
-import { Events } from '../event_service'
+import { Events } from '../services/event.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { Location } from '@angular/common';

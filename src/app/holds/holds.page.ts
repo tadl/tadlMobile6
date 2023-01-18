@@ -4,7 +4,7 @@ import { Globals } from '../globals';
 import { User } from '../user';
 import { Platform, ModalController } from '@ionic/angular';
 import { ItemDetailPage } from '../item-detail/item-detail.page';
-import {Events} from '../event_service'
+import { Events } from '../services/event.service';
 
 @Component({
   selector: 'app-holds',
@@ -54,7 +54,7 @@ export class HoldsPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.user.get_holds()
+    this.user.get_holds();
     this.subscription = this.platform.backButton.subscribe(() => {
       this._location.back();
     });
