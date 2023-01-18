@@ -22,7 +22,91 @@
         </p>
       </ion-col>
     </ion-row>
+    <ion-row *ngIf="user.logged_in == false">
+      <ion-col size="12">
+        <p text-center>
+          <img [src]="globals.logo_url" class="logo-noauth">
+        </p>
+      </ion-col>
+    </ion-row>
+    <ion-row class="searchbox" *ngIf="globals.net_status == 'online'">
+      <ion-col size="12" class="searchbox">
+        <form action=".">
+          <ion-item lines="none" class="searchbox">
+            <ion-searchbar (search)="this.search()" [(ngModel)]="this.query" [ngModelOptions]="{standalone: true}" placeholder="Search" debounce="10" class="searchbox-left"></ion-searchbar>
+            <ion-button color="primary" size="default" slot="end" expand="full" (click)="this.search()" class="searchbox-right">Go!</ion-button>
+          </ion-item>
+        </form>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="user.logged_in && globals.net_status == 'online'">
+      <ion-col size="12" *ngIf="user.checkout_count > 0 || user.holds_count > 0 || user.fines_exist == true">
+        <ion-item *ngIf="user.checkout_count > 0" color="light" lines="none" detail="false" routerLink="/checkouts" routerDirection="root" class="home-item">
+          <ion-label>
+            Checkouts
+            <span *ngIf="user.overdue > 0">(<ion-text color="danger">{{ user.overdue }} overdue!</ion-text>)</span>
+          </ion-label>
+          <ion-badge slot="end" color="dark">{{ user.checkout_count }}</ion-badge>
+        </ion-item>
+        <ion-item *ngIf="user.holds_count > 0" color="light" lines="none" detail="false" routerLink="/holds" routerDirection="root" class="home-item">
+          <ion-label>
+            Holds
+            <span *ngIf="user.holds_ready_count > 0">({{ user.holds_ready_count }} ready for pickup!)</span>
+          </ion-label>
+          <ion-badge slot="end" color="dark">{{ user.holds_count }}</ion-badge>
+        </ion-item>
+        <ion-item *ngIf="user.fines_exist" color="light" lines="none" detail="false" routerLink="/fines" routerDirection="root" class="home-item">
+          <ion-label>Fines and Fees</ion-label>
+          <ion-badge slot="end" color="danger">${{ user.fines_amount }}</ion-badge>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="globals.net_status == 'online'">
+      <ion-col size="6">
+        <ion-list>
+          <ion-button routerDirection="root" routerLink="/search" expand="full">
+            <ion-icon slot="start" name="search"></ion-icon>
+            <ion-label>Search</ion-label>
+          </ion-button>
+          <ion-button routerDirection="root" routerLink="/locations" expand="full">
+            <ion-icon slot="start" name="compass"></ion-icon>
+            <ion-label>Locations</ion-label>
+          </ion-button>
+          <ion-button (click)="globals.open_account_menu()" detail="true" expand="full">
+            <ion-icon slot="start" name="id-card"></ion-icon>
+            <ion-label>Account</ion-label>
+          </ion-button>
+        </ion-list>
+      </ion-col>
+      <ion-col size="6">
+        <ion-list>
+          <ion-button routerDirection="root" routerLink="/events" expand="full">
+            <ion-icon slot="start" name="calendar"></ion-icon>
+            <ion-label>Events</ion-label>
+          </ion-button>
+          <ion-button routerDirection="root" routerLink="/news" expand="full">
+            <ion-icon slot="start" name="megaphone"></ion-icon>
+            <ion-label>News</ion-label>
+          </ion-button>
+          <ion-button routerDirection="root" routerLink="/featured" expand="full">
+            <ion-icon slot="start" name="star"></ion-icon>
+            <ion-label>Featured</ion-label>
+          </ion-button>
+        </ion-list>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="globals.net_status == 'offline'">
+      <ion-col size="1">
+      </ion-col>
+      <ion-col size="2">
+        <img [src]="globals.offline_image" style="width:100%;">
+      </ion-col>
+      <ion-col size="9">
+        <h2 class="ion-no-margin">Offline</h2>
+        <p class="ion-no-margin">
+          No data or wifi connection is detected. This app has limited functionality without network access.
+        </p>
+      </ion-col>
+    </ion-row>
   </ion-grid>
-
-
 </ion-content>

@@ -15,8 +15,8 @@ import { ItemDetailPage } from '../item-detail/item-detail.page';
 })
 export class SearchPage implements OnInit {
 
-  query: string;
-  prev_query: string = "";
+  query: string | null;
+  prev_query: string | null;
   type: string = "keyword";
   advanced: any;
   sort: string = this.globals.sort_options[0][1];
@@ -123,6 +123,8 @@ export class SearchPage implements OnInit {
   }
 
   ngOnInit() {
+    this.query = this.route.snapshot.paramMap.get('query');
+    this.detect_search_option();
   }
 
   onIonInfinite(ev:any) {

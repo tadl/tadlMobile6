@@ -9,7 +9,9 @@ import { Router, ActivatedRoute } from '@angular/router';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage implements OnInit {
-  public home: string | null;
+
+  query: string;
+  subscription: any;
 
   constructor(
     public globals: Globals,
@@ -18,8 +20,13 @@ export class HomePage implements OnInit {
     private activatedRoute: ActivatedRoute,
     ) { }
 
+  search() {
+    if (this.query) {
+      this.router.navigate(['/search', { query: this.query }]);
+    }
+  }
+
   ngOnInit() {
-    this.home = this.activatedRoute.snapshot.paramMap.get('id');
   }
 
 }
