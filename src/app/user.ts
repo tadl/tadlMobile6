@@ -127,7 +127,9 @@ export class User {
     }
     this.token = data['user']['token'];
     this.full_name = data['user']['full_name'];
-    this.preferences = data['preferences'];
+    if(data['preferences']){
+      this.preferences = data['preferences'];
+    }
     this.checkout_count = data['user']['checkouts'];
     this.holds_count = data['user']['holds'];
     this.holds_ready_count = data['user']['holds_ready'];
