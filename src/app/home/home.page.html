@@ -24,7 +24,7 @@
     </ion-row>
     <ion-row *ngIf="user.logged_in == false">
       <ion-col size="12">
-        <p text-center>
+        <p class="ion-text-center">
           <img [src]="globals.logo_url" class="logo-noauth">
         </p>
       </ion-col>
@@ -96,12 +96,12 @@
       </ion-col>
     </ion-row>
     <ion-row *ngIf="globals.net_status == 'offline'">
-      <ion-col size="1">
+      <ion-col size="2" class="ion-no-padding">
+        <ion-button color="clear" class="ion-no-margin">
+          <ion-icon slot="icon-only" name="cloud-offline"></ion-icon>
+        </ion-button>
       </ion-col>
-      <ion-col size="2">
-        <img [src]="globals.offline_image" style="width:100%;">
-      </ion-col>
-      <ion-col size="9">
+      <ion-col size="10">
         <h2 class="ion-no-margin">Offline</h2>
         <p class="ion-no-margin">
           No data or wifi connection is detected. This app has limited functionality without network access.

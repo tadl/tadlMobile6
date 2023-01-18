@@ -38,7 +38,6 @@ export class Globals {
   /* static assets */
   public logo_url: string = '/assets/logo.png';
   public square_logo_url: string = '/assets/logo-clock-only.png';
-  public offline_image: string = '/assets/offline.png';
 
   /* catalog things */
   public catalog_schema: string = 'https://';
