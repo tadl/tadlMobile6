@@ -611,19 +611,27 @@ export class User {
       });
   }
 
-  get_checkout_history(page?:number) {
+  get_checkout_history(page?:number, more?:boolean) {
     if (!page) { this.checkout_history_page = 0; }
     let params = new HttpParams()
       .set("token", this.token)
       .set("v", "5")
       .set("page", this.checkout_history_page);
+    let new_items: any = [];
     let url = this.globals.catalog_checkout_history_url;
     this.globals.loading_show();
     this.http.get(url, {params: params}).subscribe((data:any) => {
       this.globals.api_loading = false;
-      if (JSON.parse(JSON.stringify(data))["user"] && JSON.parse(JSON.stringify(data))["checkouts"]) {
-        this.checkout_history = JSON.parse(JSON.stringify(data))["checkouts"];
+      if (data['user'] && data['checkouts']) {
+        new_items = data['checkouts'];
         if (data['more_results'] == "true") { this.more_checkout_history = true; } else { this.more_checkout_history = false; }
+        if (more == true) {
+          for (let i = 0; i < new_items.length; i++) {
+            this.checkout_history.push(new_items[i]);
+          }
+        } else {
+          this.checkout_history = new_items;
+        }
       }
     },
     (err) => {
