@@ -25,7 +25,7 @@ export class EventsPage implements OnInit {
     private platform: Platform,
     private http: HttpClient,
   ) { }
-  
+
   get_events(loc?:string) {
     let params = new HttpParams()
       .set("ongoing_events", "show")

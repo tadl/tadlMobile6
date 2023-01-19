@@ -15,8 +15,8 @@ import { NgxBarcode6Module } from 'ngx-barcode6';
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    BrowserModule, 
-    IonicModule.forRoot(), 
+    BrowserModule,
+    IonicModule.forRoot(),
     AppRoutingModule,
     FormsModule,
     HttpClientModule,

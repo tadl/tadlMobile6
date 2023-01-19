@@ -13,49 +13,45 @@
 
 <ion-content [fullscreen]="true">
 
-  <div id="container">
-
-    <div *ngIf="!this.locations">
-      Locations aren't loaded yet.
-    </div>
-
-    <ion-list *ngIf="this.locations">
-      <ion-item *ngIf="globals.net_status == 'offline'" detail="false" lines="full">
-        <ion-thumbnail slot="start">
-          <img src="/assets/offline.png">
-        </ion-thumbnail>
-        <ion-label>
-          <ion-text><h2>Offline</h2></ion-text>
-          <ion-text>
-            <p>Check your data or wifi connection.</p>
-          </ion-text>
-          <ion-text color="medium" text-wrap *ngIf="offline_updated">
-            <p>Last updated {{ offline_updated }}</p>
-          </ion-text>
-        </ion-label>
-      </ion-item>
-      <ion-item *ngFor="let location of this.locations" (click)="view_details(location)" detail="true" lines="full">
-        <ion-thumbnail slot="start" *ngIf="location.image">
-          <ion-img [src]="location.image"></ion-img>
-        </ion-thumbnail>
-        <ion-label>
-          <ion-text>
-            <h2 [innerHTML]="location.fullname"></h2>
-          </ion-text>
-          <ion-text>
-            <p *ngIf="location[globals.day_today().toLowerCase()]=='Closed'">Closed today</p>
-            <p *ngIf="location[globals.day_today().toLowerCase()]!='Closed'">Open {{ location[globals.day_today().toLowerCase()] }} today</p>
-          </ion-text>
-          <ion-text *ngIf="location.hoursnote">
-            <p>{{ location.hoursnote }}</p>
-          </ion-text>
-          <ion-text color="medium">
-            <p>{{ location.address }}, {{ location.citystatezip }}</p>
-          </ion-text>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-
+  <div *ngIf="!this.locations">
+    Locations aren't loaded yet.
   </div>
+
+  <ion-list *ngIf="this.locations">
+    <ion-item *ngIf="globals.net_status == 'offline'" detail="false" lines="full">
+      <ion-thumbnail slot="start">
+        <img src="/assets/offline.png">
+      </ion-thumbnail>
+      <ion-label>
+        <ion-text><h2>Offline</h2></ion-text>
+        <ion-text>
+          <p>Check your data or wifi connection.</p>
+        </ion-text>
+        <ion-text color="medium" text-wrap *ngIf="offline_updated">
+          <p>Last updated {{ offline_updated }}</p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+    <ion-item *ngFor="let location of this.locations" (click)="view_details(location)" detail="true" lines="full">
+      <ion-thumbnail slot="start" *ngIf="location.image">
+        <ion-img [src]="location.image"></ion-img>
+      </ion-thumbnail>
+      <ion-label>
+        <ion-text>
+          <h2 [innerHTML]="location.fullname"></h2>
+        </ion-text>
+        <ion-text>
+          <p *ngIf="location[globals.day_today().toLowerCase()]=='Closed'">Closed today</p>
+          <p *ngIf="location[globals.day_today().toLowerCase()]!='Closed'">Open {{ location[globals.day_today().toLowerCase()] }} today</p>
+        </ion-text>
+        <ion-text *ngIf="location.hoursnote">
+          <p>{{ location.hoursnote }}</p>
+        </ion-text>
+        <ion-text color="medium">
+          <p>{{ location.address }}, {{ location.citystatezip }}</p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
 </ion-content>

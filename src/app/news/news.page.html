@@ -13,39 +13,35 @@
 
 <ion-content [fullscreen]="true">
 
-  <div id="container">
-
-    <div *ngIf="!this.news" class="ion-text-center">
-      <ion-grid>
-        <ion-row>
-          <ion-col>
-            <ion-icon name="megaphone" class="heading"></ion-icon>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <ion-text>Loading News...</ion-text>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-
-    <ion-list *ngIf="this.news">
-      <ion-item *ngFor="let post of this.news" (click)="this.globals.open_page(post.post_url)" detail="true">
-        <ion-thumbnail slot="start">
-          <ion-img *ngIf="post.featured_image_urls.thumbnail" [src]="post.featured_image_urls.thumbnail"></ion-img>
-        </ion-thumbnail>
-        <ion-label>
-          <ion-text>
-            <h2 [innerHTML]="post.title.rendered"></h2>
-          </ion-text>
-          <ion-text color="medium">
-            <p>Posted {{ globals.format_date(post.date, 'news') }}</p>
-          </ion-text>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-
+  <div *ngIf="!this.news" class="ion-text-center">
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-icon name="megaphone" class="heading"></ion-icon>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-text>Loading News...</ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </div>
+
+  <ion-list *ngIf="this.news">
+    <ion-item *ngFor="let post of this.news" (click)="this.globals.open_page(post.post_url)" detail="true">
+      <ion-thumbnail slot="start">
+        <ion-img *ngIf="post.featured_image_urls.thumbnail" [src]="post.featured_image_urls.thumbnail"></ion-img>
+      </ion-thumbnail>
+      <ion-label>
+        <ion-text>
+          <h2 [innerHTML]="post.title.rendered"></h2>
+        </ion-text>
+        <ion-text color="medium">
+          <p>Posted {{ globals.format_date(post.date, 'news') }}</p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
 </ion-content>

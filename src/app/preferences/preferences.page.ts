@@ -364,7 +364,7 @@ export class PreferencesPage implements OnInit {
     this.user.update_preferences(params, null);
   }
 
-  
+
   ngOnInit() {
     if (this.user.token) {
       this.user.get_preferences();
