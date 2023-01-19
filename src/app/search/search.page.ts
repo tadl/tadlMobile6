@@ -126,7 +126,7 @@ export class SearchPage implements OnInit {
   }
 
   onIonInfinite(ev:any) {
-    if (this.user.more_checkout_history) {
+    if (this.more_results) {
       this.page++;
       this.get_results(this.page, true);
       setTimeout(() => {

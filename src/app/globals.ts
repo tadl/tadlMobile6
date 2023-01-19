@@ -241,12 +241,6 @@ export class Globals {
     await this.modalController.dismiss(onClosedData);
   }
 
-  /* image error */
-  image_error(event:any = {}) {
-    console.log("image error! " + event.target.src);
-    event.target.src = this.square_logo_url;
-  }
-
   /* api loading indicator */
   loading_show() {
     this.api_loading = true;
