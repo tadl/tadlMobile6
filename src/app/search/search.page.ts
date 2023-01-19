@@ -67,17 +67,17 @@ export class SearchPage implements OnInit {
     var url = this.globals.catalog_search_url;
     this.globals.loading_show();
     this.http.get(url, {params: params})
-      .subscribe(data => {
+      .subscribe((data:any) => {
         this.globals.api_loading = false;
         this.prev_query = this.query;
         if (data) {
-          if (JSON.parse(JSON.stringify(data))["type"]) { this.type = JSON.parse(JSON.stringify(data))["type"]; }
-          if (JSON.parse(JSON.stringify(data))["more_results"]) {
+          if (data['type']) { this.type = data['type']; }
+          if (data['more_results']) {
             this.more_results = true;
           } else {
             this.more_results = false;
           }
-          this.new_results = JSON.parse(JSON.stringify(data))["results"];
+          this.new_results = data['results'];
           if (more == true) {
             for (let i = 0; i < this.new_results.length; i++) {
               this.results.push(this.new_results[i]);
@@ -85,8 +85,6 @@ export class SearchPage implements OnInit {
           } else {
             this.results = this.new_results;
           }
-          //console.log(this.results);
-          //console.log(this.more_results);
         } else {
           this.toast.presentToast(this.globals.server_error_msg);
         }

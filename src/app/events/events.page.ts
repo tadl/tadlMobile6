@@ -34,10 +34,10 @@ export class EventsPage implements OnInit {
     if (loc) { params = params.append("branches", loc); }
     this.globals.loading_show()
     this.http.get<any[]>(this.url, {params: params})
-      .subscribe(data => {
+      .subscribe((data:any) => {
         this.globals.api_loading = false;
         if (data) {
-          data.forEach(function(item, index) {
+          data.forEach(function(item:any, index:any) {
             if (item.branch) {
               data[index]['branchid'] = Object.keys(item.branch)[0];
               data[index]['branchname'] = Object.values(item.branch)[0];

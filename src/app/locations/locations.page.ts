@@ -35,10 +35,10 @@ export class LocationsPage implements OnInit {
     if (this.globals.net_status == "online") {
       this.globals.loading_show();
       this.http.get(this.url)
-        .subscribe(data => {
+        .subscribe((data:any) => {
           if (data) {
             this.globals.api_loading = false;
-            this.locations = JSON.parse(JSON.stringify(data))["locations"];
+            this.locations = data['locations'];
             this.storage.set('locations', JSON.stringify(this.locations)).then(() => {
               this.storage.set('locations_timestamp', new Date());
             });
@@ -51,7 +51,7 @@ export class LocationsPage implements OnInit {
           this.toast.presentToast(this.globals.server_error_msg);
         });
     } else {
-      this.storage.get('locations').then((data) => {
+      this.storage.get('locations').then((data:any) => {
         if (data) {
           this.locations = JSON.parse(data);
           this.storage.get('locations_timestamp').then((data) => {

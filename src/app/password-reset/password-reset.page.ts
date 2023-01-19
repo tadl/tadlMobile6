@@ -25,7 +25,7 @@ export class PasswordResetPage implements OnInit {
       .set("v", "5");
     let url = this.globals.catalog_password_reset_url;
     this.http.get(url, {params: params})
-      .subscribe(data => {
+      .subscribe((data:any) => {
         console.log(data);
         this.request_sent = true;
       },

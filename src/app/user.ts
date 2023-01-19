@@ -589,7 +589,7 @@ export class User {
     let url = this.globals.catalog_fines_url;
     this.globals.loading_show();
     this.http.get(url, {params: params})
-      .subscribe(data => {
+      .subscribe((data:any) => {
         this.globals.api_loading = false;
         if (data) {
           this.fines = data;

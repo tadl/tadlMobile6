@@ -29,7 +29,7 @@ export class NewsPage implements OnInit {
   get_news() {
     this.globals.loading_show();
     this.http.get(this.url)
-      .subscribe(data => {
+      .subscribe((data:any) => {
         this.globals.api_loading = false;
         if (data) {
           this.news = data;
