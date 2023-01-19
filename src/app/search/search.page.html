@@ -39,7 +39,7 @@
         </ion-item>
         <ion-item>
           <ion-label>Format</ion-label>
-          <ion-select [(ngModel)]="format" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" [value]="format" interface="popover">
+          <ion-select [(ngModel)]="format" [ngModelOptions]="{standalone: true}" (ionChange)="detect_search_option()" [value]="format" interface="popover" [interfaceOptions]="{'cssClass': 'search-format-wider-popover'}">
             <ion-select-option  *ngFor="let format of globals.formats" [value]="format">
               {{ format }}
             </ion-select-option>
