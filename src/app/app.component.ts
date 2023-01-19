@@ -1,7 +1,9 @@
 import { Component} from '@angular/core';
 import { Globals } from './globals';
 import { User } from './user';
-import { Storage } from '@ionic/storage-angular';
+import { Storage } from '@ionic/storage';
+import { Network } from '@capacitor/network';
+import { Platform } from '@ionic/angular';
 import { fromEvent } from 'rxjs';
 
 @Component({
@@ -11,7 +13,7 @@ import { fromEvent } from 'rxjs';
 })
 export class AppComponent {
 
-  public appPages = [
+  public appPages:any = [
     { title: 'Home', url: '/home', icon: 'home' },
     { title: 'Search', url: '/search', icon: 'search' },
     { title: 'Locations', url: '/locations', icon: 'compass' },
@@ -24,6 +26,7 @@ export class AppComponent {
   constructor(
     public globals: Globals,
     public user: User,
+    public platform: Platform,
     private storage: Storage,
   ) {}
 
@@ -33,12 +36,31 @@ export class AppComponent {
     this.card_modal = isOpen;
   }
 
+  async getNetworkStatus() {
+    let status = await Network.getStatus();
+    if (status.connected == true) {
+      this.globals.net_status = "online";
+      this.globals.net_type = status.connectionType;
+    } else {
+      this.globals.net_status = "offline";
+      this.globals.net_type = status.connectionType;
+    }
+    console.log(status);
+  }
+
   ngOnInit() {
+    this.getNetworkStatus();
+    Network.addListener('networkStatusChange', status => {
+      this.getNetworkStatus();
+      console.log('Network status changed ', status);
+    });
+    this.platform.resume.subscribe(async () => {
+      this.user.autolog();
+    });
     this.storage.create();
     this.user.autolog();
-    fromEvent(document, 'didDismiss')
-      .subscribe(event => {
-        this.card_modal = false;
-      });
+    fromEvent(document, 'didDismiss').subscribe(event => {
+      this.card_modal = false;
+    });
   }
 }
