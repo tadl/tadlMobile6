@@ -60,6 +60,20 @@ export class CheckoutHistoryPage implements OnInit {
     });
   }
 
+  onIonInfinite(ev:any) {
+    if (this.user.more_checkout_history) {
+      this.user.checkout_history_page++;
+      this.user.get_checkout_history(this.user.checkout_history_page);
+      setTimeout(() => {
+        (ev as InfiniteScrollCustomEvent).target.complete();
+      }, 500);
+    } else {
+      setTimeout(() => {
+        (ev as InfiniteScrollCustomEvent).target.complete();
+      }, 10);
+    }
+  }
+
   ionViewDidEnter() {
     this.subscription = this.platform.backButton.subscribe(() => {
       this._location.back();

@@ -38,6 +38,7 @@ export class User {
   stored_accounts_keys: Array<string> = [];
   checkout_history: Array<any> = [];
   checkout_history_page: number = 0;
+  more_checkout_history: boolean = false;
 
   constructor(
     public actionSheetController: ActionSheetController,
@@ -618,10 +619,11 @@ export class User {
       .set("page", this.checkout_history_page);
     let url = this.globals.catalog_checkout_history_url;
     this.globals.loading_show();
-    this.http.get(url, {params: params}).subscribe(data => {
+    this.http.get(url, {params: params}).subscribe((data:any) => {
       this.globals.api_loading = false;
       if (JSON.parse(JSON.stringify(data))["user"] && JSON.parse(JSON.stringify(data))["checkouts"]) {
         this.checkout_history = JSON.parse(JSON.stringify(data))["checkouts"];
+        if (data['more_results'] == "true") { this.more_checkout_history = true; } else { this.more_checkout_history = false; }
       }
     },
     (err) => {
