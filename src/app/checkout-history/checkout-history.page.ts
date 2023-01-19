@@ -63,7 +63,7 @@ export class CheckoutHistoryPage implements OnInit {
   onIonInfinite(ev:any) {
     if (this.user.more_checkout_history) {
       this.user.checkout_history_page++;
-      this.user.get_checkout_history(this.user.checkout_history_page);
+      this.user.get_checkout_history(this.user.checkout_history_page, true);
       setTimeout(() => {
         (ev as InfiniteScrollCustomEvent).target.complete();
       }, 500);
