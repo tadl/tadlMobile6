@@ -35,7 +35,6 @@ export class EventsPage implements OnInit {
         this.globals.api_loading = false;
         if (data['events']) {
           this.web_events = data['events'];
-          console.log(this.web_events);
         } else {
           this.toast.presentToast(this.globals.server_error_msg);
         }

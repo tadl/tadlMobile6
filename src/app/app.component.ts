@@ -45,7 +45,6 @@ export class AppComponent {
       this.globals.net_status = "offline";
       this.globals.net_type = status.connectionType;
     }
-    console.log(status);
   }
 
   ngOnInit() {

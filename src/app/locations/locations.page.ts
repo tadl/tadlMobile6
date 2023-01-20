@@ -42,7 +42,6 @@ export class LocationsPage implements OnInit {
             this.storage.set('locations', JSON.stringify(this.locations)).then(() => {
               this.storage.set('locations_timestamp', new Date());
             });
-            console.log(this.locations);
           } else {
             this.toast.presentToast(this.globals.server_error_msg);
           }

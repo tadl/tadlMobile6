@@ -111,7 +111,6 @@ export class User {
     if (data.error) {
       this.show_error_message("Invalid username and/or password. Please try again.");
     } else {
-      console.log(data);
       this.update_stored_accounts();
       this.update_user_object(data);
       this.process_checkouts(data);

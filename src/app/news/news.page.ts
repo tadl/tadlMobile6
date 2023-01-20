@@ -33,7 +33,6 @@ export class NewsPage implements OnInit {
         this.globals.api_loading = false;
         if (data) {
           this.news = data;
-          console.log(this.news);
         } else {
           this.toast.presentToast(this.globals.server_error_msg);
         }
