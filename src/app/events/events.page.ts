@@ -27,23 +27,14 @@ export class EventsPage implements OnInit {
   ) { }
 
   get_events(loc?:string) {
-    let params = new HttpParams()
-      .set("ongoing_events", "show")
-      .set("start", "12:00am")
-      .set("end", "1month");
-    if (loc) { params = params.append("branches", loc); }
+    let params = new HttpParams();
+    if (loc) { params = params.append("venue", loc); }
     this.globals.loading_show()
     this.http.get<any[]>(this.url, {params: params})
       .subscribe((data:any) => {
         this.globals.api_loading = false;
-        if (data) {
-          data.forEach(function(item:any, index:any) {
-            if (item.branch) {
-              data[index]['branchid'] = Object.keys(item.branch)[0];
-              data[index]['branchname'] = Object.values(item.branch)[0];
-            }
-          });
-          this.web_events = data;
+        if (data['events']) {
+          this.web_events = data['events'];
           console.log(this.web_events);
         } else {
           this.toast.presentToast(this.globals.server_error_msg);

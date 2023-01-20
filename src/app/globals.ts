@@ -71,7 +71,7 @@ export class Globals {
 
   /* website things */
   public website_schema: string = 'https://';
-  public events_api_url: string = this.website_schema + this.website_host + '/events/feed/json';
+  public events_api_url: string = this.website_schema + this.tools_host + '/mobile_events.json';
 
   public news_api_url: string = this.website_schema + this.tools_host + '/posts';
 

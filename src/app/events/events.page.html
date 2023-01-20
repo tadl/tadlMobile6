@@ -43,6 +43,7 @@
         <ion-img [src]="event.image"></ion-img>
       </ion-thumbnail>
       <ion-thumbnail slot="start" *ngIf="!event.image">
+        <ion-img [src]="this.globals.square_logo_url"></ion-img>
       </ion-thumbnail>
       <ion-label>
         <ion-text>
