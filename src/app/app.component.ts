@@ -1,10 +1,11 @@
 import { Component} from '@angular/core';
 import { Globals } from './globals';
 import { User } from './user';
-import { Storage } from '@ionic/storage';
+import { Storage } from '@ionic/storage-angular';
 import { Network } from '@capacitor/network';
 import { Platform } from '@ionic/angular';
 import { fromEvent } from 'rxjs';
+import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 
 @Component({
   selector: 'app-root',
@@ -48,6 +49,8 @@ export class AppComponent {
   }
 
   ngOnInit() {
+    this.storage.defineDriver(CordovaSQLiteDriver);
+    this.storage.create();
     this.getNetworkStatus();
     Network.addListener('networkStatusChange', status => {
       this.getNetworkStatus();
@@ -56,7 +59,6 @@ export class AppComponent {
     this.platform.resume.subscribe(async () => {
       this.user.autolog();
     });
-    this.storage.create();
     this.user.autolog();
     fromEvent(document, 'didDismiss').subscribe(event => {
       this.card_modal = false;

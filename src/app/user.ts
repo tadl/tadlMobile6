@@ -4,7 +4,7 @@ import { ModalController, ActionSheetController, AlertController, NavController}
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
-import { Storage } from '@ionic/storage';
+import { Storage } from '@ionic/storage-angular';
 import { Events } from './services/event.service';
 import { ToastService } from './services/toast.service';
 import { Router } from '@angular/router';
