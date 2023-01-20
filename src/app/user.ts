@@ -67,7 +67,7 @@ export class User {
     .set("full", "true")
     .set("v", "5");
     this.globals.loading_show();
-    this.http.get('https://apiv4.catalog.tadl.org/login.json', {params: params})
+    this.http.get(this.globals.catalog_login_url, {params: params})
       .subscribe({
         next: (response) => this.load_user_data(response),
         error: (error) => this.show_error_message("Could not reach login server. Please verify you have a data connection or try again later."),
@@ -175,7 +175,7 @@ export class User {
     this.http.get(this.globals.catalog_logout_url, {params: params})
     .subscribe((data:any) => {
       this.globals.api_loading = false;
-      if (JSON.parse(JSON.stringify(data))["success"] || JSON.parse(JSON.stringify(data))["error"] == "not logged in or invalid token") {
+      if (data['success'] || data['error'] == "not logged in or invalid token") {
         if (token_only == false) {
           delete this.stored_accounts[this.id];
           this.stored_accounts_keys = Object.keys(this.stored_accounts);
