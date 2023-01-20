@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Platform, ModalController, MenuController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { Browser } from '@capacitor/browser';
+import { Device } from '@capacitor/device';
 
 @Injectable()
 
@@ -17,6 +18,8 @@ export class Globals {
   /* app version */
   public app_version: string = '6.0.0';
   public update_version: string = '2023011900';
+
+  public device_info: any;
 
   /* basic information */
   public catalog_host: string = 'apiv4.catalog.tadl.org'; /* hostname for catalog api */
@@ -244,6 +247,10 @@ export class Globals {
   /* api loading indicator */
   loading_show() {
     this.api_loading = true;
+  }
+
+  async getDeviceInfo() {
+    this.device_info = await Device.getInfo();
   }
 
 }

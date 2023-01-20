@@ -86,7 +86,7 @@ export class User {
   }
 
   update_stored_accounts() {
-    this.storage.get('stored_accounts').then((data) => {
+    this.storage.get('stored_accounts').then((data:any) => {
       this.stored_accounts = JSON.parse(data);
       this.stored_accounts_keys = Object.keys(this.stored_accounts);
     });

@@ -62,5 +62,6 @@ export class AppComponent {
     fromEvent(document, 'didDismiss').subscribe(event => {
       this.card_modal = false;
     });
+    this.globals.getDeviceInfo();
   }
 }

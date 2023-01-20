@@ -7,6 +7,7 @@ import { Location } from '@angular/common';
 import { User } from '../user';
 import { ToastService } from '../services/toast.service';
 import { ItemDetailPage } from '../item-detail/item-detail.page';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-search',
@@ -50,6 +51,9 @@ export class SearchPage implements OnInit {
     }
     if (!page || this.query != this.prev_query) {
       this.page = 0;
+    }
+    if (this.globals.device_info.operatingSystem == "ios" || this.globals.device_info.operatingSystem == "android") {
+      Keyboard.hide();
     }
     let params = new HttpParams()
       .set("v", "5")
