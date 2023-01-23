@@ -247,6 +247,13 @@ export class Globals {
     await this.modalController.dismiss(onClosedData);
     this.modal_open = false;
   }
+  async go_back() {
+    if (this.modal_open == true) {
+      this.close_modal();
+    } else {
+      window.history.back();
+    }
+  }
 
   /* api loading indicator */
   loading_show() {
@@ -258,20 +265,24 @@ export class Globals {
   }
 
   async confirm_exit() {
-    const alert = await this.alertController.create({
-      header: 'Exit the app?',
-      buttons: [{
-        text: 'Cancel',
-        role: 'cancel',
-        cssClass: 'secondary',
-      }, {
-        text: 'Exit App',
-        handler: () => {
-          App.exitApp();
-        }
-      }]
-    });
-    await alert.present();
+    if (this.modal_open == true) {
+      this.close_modal();
+    } else {
+      const alert = await this.alertController.create({
+        header: 'Exit the app?',
+        buttons: [{
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        }, {
+          text: 'Exit App',
+          handler: () => {
+            App.exitApp();
+          }
+        }]
+      });
+      await alert.present();
+    }
   }
 
 }

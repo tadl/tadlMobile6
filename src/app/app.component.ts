@@ -67,17 +67,9 @@ export class AppComponent {
     });
     App.addListener('backButton', ( { canGoBack }) => {
       if (canGoBack) {
-        if (this.globals.modal_open == true) {
-          this.globals.close_modal();
-        } else {
-          window.history.back();
-        }
+        this.globals.go_back();
       } else {
-        if (this.globals.modal_open == true) {
-          this.globals.close_modal();
-        } else {
-          this.globals.confirm_exit();
-        }
+        this.globals.confirm_exit();
       }
     });
     this.platform.resume.subscribe(async () => {
