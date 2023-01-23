@@ -5,6 +5,7 @@ import { Storage } from '@ionic/storage-angular';
 import { Network } from '@capacitor/network';
 import { Platform } from '@ionic/angular';
 import { fromEvent } from 'rxjs';
+import { Events } from './services/event.service';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 
 @Component({
@@ -25,6 +26,7 @@ export class AppComponent {
   ];
 
   constructor(
+    public events: Events,
     public globals: Globals,
     public user: User,
     public platform: Platform,
@@ -48,10 +50,16 @@ export class AppComponent {
     }
   }
 
+  async setup_storage(){
+    await this.storage.defineDriver(CordovaSQLiteDriver);
+    await this.storage.create();
+    this.events.publish('storage_setup_complete');
+  }
+
   ngOnInit() {
-    this.storage.defineDriver(CordovaSQLiteDriver);
-    this.storage.create();
+    this.setup_storage()
     this.getNetworkStatus();
+    this.user.autolog();
     Network.addListener('networkStatusChange', status => {
       this.getNetworkStatus();
       console.log('Network status changed ', status);

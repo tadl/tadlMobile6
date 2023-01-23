@@ -39,6 +39,7 @@ export class User {
   checkout_history: Array<any> = [];
   checkout_history_page: number = 0;
   more_checkout_history: boolean = false;
+  logged_out_id: number;
 
   constructor(
     public actionSheetController: ActionSheetController,
@@ -85,17 +86,23 @@ export class User {
     this.logout(true);
   }
 
-  update_stored_accounts() {
-    this.storage.get('stored_accounts').then((data:any) => {
+  async update_stored_accounts() {
+    await this.storage.get('stored_accounts').then((data:any) => {
       this.stored_accounts = JSON.parse(data);
-      this.stored_accounts_keys = Object.keys(this.stored_accounts);
+      if(this.stored_accounts){
+        this.stored_accounts_keys = Object.keys(this.stored_accounts); 
+      }else{
+        this.stored_accounts = {}
+      }
     });
     if (this.id) {
+      console.log('got here')
       let user = {
         hashed_password: this.hashed_password,
         username: this.username,
         full_name: this.full_name,
       };
+      
       this.stored_accounts[this.id] = user;
       this.storage.set('stored_accounts', JSON.stringify(this.stored_accounts));
       this.stored_accounts_keys = Object.keys(this.stored_accounts);
@@ -111,8 +118,8 @@ export class User {
     if (data.error) {
       this.show_error_message("Invalid username and/or password. Please try again.");
     } else {
+      await this.update_user_object(data);
       this.update_stored_accounts();
-      this.update_user_object(data);
       this.process_checkouts(data);
       this.process_holds(data);
     }
@@ -176,9 +183,11 @@ export class User {
       this.globals.api_loading = false;
       if (data['success'] || data['error'] == "not logged in or invalid token") {
         if (token_only == false) {
-          delete this.stored_accounts[this.id];
-          this.stored_accounts_keys = Object.keys(this.stored_accounts);
-          this.storage.set('stored_accounts', JSON.stringify(this.stored_accounts));
+          if(this.stored_accounts){
+            delete this.stored_accounts[this.id];
+            this.stored_accounts_keys = Object.keys(this.stored_accounts);
+            this.storage.set('stored_accounts', JSON.stringify(this.stored_accounts));
+          }
         } else {}
         this.zone.run(() => {
           this.clear_user();
@@ -192,16 +201,19 @@ export class User {
   }
 
   autolog() {
-    this.storage.get('username').then((val: string) => {
-      if (val) {
-        this.username = val;
-        this.storage.get('hashed_password').then((val: string) => {
-          this.hashed_password = val;
-          this.login(true);
-        });
-      } else {
-        this.username = '';
-      }
+    const subscription = this.events.subscribe('storage_setup_complete', () => {
+      this.storage.get('username').then((val: string) => {
+        if (val) {
+          this.username = val;
+          this.storage.get('hashed_password').then((val: string) => {
+            this.hashed_password = val;
+            this.login(true);
+          });
+        } else {
+          this.username = '';
+        }
+      });
+      subscription.unsubscribe();
     });
   }
 
