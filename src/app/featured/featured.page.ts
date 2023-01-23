@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Platform, ModalController, IonInfiniteScroll } from '@ionic/angular';
+import { ModalController, IonInfiniteScroll } from '@ionic/angular';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { Globals } from '../globals';
@@ -35,7 +35,6 @@ export class FeaturedPage implements OnInit {
     public user: User,
     public toast: ToastService,
     private http: HttpClient,
-    private platform: Platform,
     private _location: Location,
     private modalController: ModalController,
   ) { }
@@ -109,9 +108,6 @@ export class FeaturedPage implements OnInit {
     modal.onDidDismiss().then((dataReturned) => {
       if (dataReturned !== null) {
         console.log('Modal sent data: ', dataReturned);
-        this.subscription = this.platform.backButton.subscribe(() => {
-          this._location.back();
-        });
       }
     });
     return await modal.present();
@@ -122,9 +118,6 @@ export class FeaturedPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
