@@ -1,4 +1,4 @@
-package org.tadl.TADLMobile;
+package org.TADL.TADLMobile;
 
 import com.getcapacitor.BridgeActivity;
 

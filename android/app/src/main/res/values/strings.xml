@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">tadlMobile6</string>
-    <string name="title_activity_main">tadlMobile6</string>
-    <string name="package_name">org.tadl.TADLMobile</string>
-    <string name="custom_url_scheme">org.tadl.TADLMobile</string>
+    <string name="app_name">TADL</string>
+    <string name="title_activity_main">TADL</string>
+    <string name="package_name">org.TADL.TADLMobile</string>
+    <string name="custom_url_scheme">org.TADL.TADLMobile</string>
 </resources>
