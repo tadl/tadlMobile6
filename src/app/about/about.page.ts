@@ -15,7 +15,6 @@ export class AboutPage implements OnInit {
 
   platforms: string = this.platform.platforms().join('/');
   storage_driver: string | null = this.storage.driver;
-  subscription: any;
   device_info: any = {};
 
   constructor(
@@ -36,13 +35,9 @@ export class AboutPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }

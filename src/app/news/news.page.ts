@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Globals } from '../globals';
-import { Platform, ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
@@ -15,14 +15,12 @@ export class NewsPage implements OnInit {
   url: string = this.globals.news_api_url;
   news: any = [];
   page: any = 1;
-  subscription: any;
 
   constructor(
     public globals: Globals,
     public toast: ToastService,
     public modalController: ModalController,
     private http: HttpClient,
-    private platform: Platform,
     private _location: Location,
   ) { }
 
@@ -47,13 +45,9 @@ export class NewsPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }

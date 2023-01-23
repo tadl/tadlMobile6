@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Events } from '../services/event.service';
-import { Platform, ActionSheetController, AlertController } from '@ionic/angular';
+import { ActionSheetController, AlertController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
@@ -22,11 +22,9 @@ export class PreferencesPage implements OnInit {
     public alertController: AlertController,
     public toast: ToastService,
     private http: HttpClient,
-    private platform: Platform,
     private _location: Location,
   ) { }
 
-  subscription: any;
   ignore_change: boolean = false;
 
   async update_hold_pickup_location(event: any) {
@@ -372,13 +370,9 @@ export class PreferencesPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }

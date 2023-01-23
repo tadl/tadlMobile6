@@ -11,7 +11,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 export class HomePage implements OnInit {
 
   query: string;
-  subscription: any;
 
   constructor(
     public globals: Globals,

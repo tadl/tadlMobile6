@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Globals } from '../globals';
-import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-location-detail',
@@ -14,7 +13,6 @@ export class LocationDetailPage implements OnInit {
 
   constructor(
     public globals: Globals,
-    private platform: Platform,
   ) { }
 
   ngOnInit() {

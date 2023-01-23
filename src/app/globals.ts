@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Platform, ModalController, MenuController } from '@ionic/angular';
+import { AlertController, Platform, ModalController, MenuController } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { Browser } from '@capacitor/browser';
 import { Device } from '@capacitor/device';
+import { App } from '@capacitor/app';
 
 @Injectable()
 
@@ -10,6 +11,7 @@ export class Globals {
   constructor(
     private menuController: MenuController,
     private modalController: ModalController,
+    private alertController: AlertController,
     private platform: Platform,
   ) {}
 
@@ -251,6 +253,23 @@ export class Globals {
 
   async getDeviceInfo() {
     this.device_info = await Device.getInfo();
+  }
+
+  async confirm_exit() {
+    const alert = await this.alertController.create({
+      header: 'Exit the app?',
+      buttons: [{
+        text: 'Cancel',
+        role: 'cancel',
+        cssClass: 'secondary',
+      }, {
+        text: 'Exit App',
+        handler: () => {
+          App.exitApp();
+        }
+      }]
+    });
+    await alert.present();
   }
 
 }

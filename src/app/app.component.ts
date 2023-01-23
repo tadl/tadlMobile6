@@ -7,6 +7,7 @@ import { Platform } from '@ionic/angular';
 import { fromEvent } from 'rxjs';
 import { Events } from './services/event.service';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-root',
@@ -63,6 +64,13 @@ export class AppComponent {
     Network.addListener('networkStatusChange', status => {
       this.getNetworkStatus();
       console.log('Network status changed ', status);
+    });
+    App.addListener('backButton', ( { canGoBack }) => {
+      if (canGoBack) {
+        window.history.back();
+      } else {
+        this.globals.confirm_exit();
+      }
     });
     this.platform.resume.subscribe(async () => {
       this.user.autolog();
