@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Platform, InfiniteScrollCustomEvent, ModalController } from '@ionic/angular';
+import { InfiniteScrollCustomEvent, ModalController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { Globals } from '../globals';
 import { User } from '../user';
@@ -15,20 +15,16 @@ import { ItemDetailPage } from '../item-detail/item-detail.page';
 
 export class CheckoutHistoryPage implements OnInit {
 
-  subscription: any;
-
   constructor(
     public globals: Globals,
     public user: User,
     public item: Item,
     public events: Events,
-    private platform: Platform,
     private _location: Location,
     private modalController: ModalController,
   ) { }
 
   async details(item:any) {
-    this.subscription.unsubscribe();
     const modal = await this.modalController.create({
       component: ItemDetailPage,
       componentProps: {
@@ -38,9 +34,6 @@ export class CheckoutHistoryPage implements OnInit {
     modal.onDidDismiss().then((dataReturned) => {
       if (dataReturned !== null) {
         console.log('Modal sent data: ', dataReturned);
-        this.subscription = this.platform.backButton.subscribe(() => {
-          this._location.back();
-        });
       }
     });
     return await modal.present();
@@ -79,13 +72,9 @@ export class CheckoutHistoryPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }

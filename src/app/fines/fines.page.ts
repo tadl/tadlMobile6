@@ -1,6 +1,5 @@
 import { Events } from '../services/event.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Platform } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { Globals } from '../globals';
 import { User } from '../user';
@@ -12,13 +11,10 @@ import { User } from '../user';
 })
 export class FinesPage implements OnInit {
 
-  subscription: any;
-
   constructor(
     public globals: Globals,
     public user: User,
     public events: Events,
-    private platform: Platform,
     private _location: Location,
   ) { }
 
@@ -39,13 +35,9 @@ export class FinesPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }

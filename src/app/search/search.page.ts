@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Globals } from '../globals';
 import { ActivatedRoute } from '@angular/router';
-import { Platform, ModalController, InfiniteScrollCustomEvent } from '@ionic/angular';
+import { ModalController, InfiniteScrollCustomEvent } from '@ionic/angular';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { User } from '../user';
@@ -32,7 +32,6 @@ export class SearchPage implements OnInit {
   results: any = [];
   new_results: any = [];
   more_results: boolean = false;
-  subscription: any;
 
   constructor(
     public globals: Globals,
@@ -40,7 +39,6 @@ export class SearchPage implements OnInit {
     public toast: ToastService,
     private http: HttpClient,
     private route: ActivatedRoute,
-    private platform: Platform,
     private _location: Location,
     private modalController: ModalController,
   ) { }
@@ -107,7 +105,6 @@ export class SearchPage implements OnInit {
   }
 
   async details(item:any) {
-    this.subscription.unsubscribe();
     const modal = await this.modalController.create({
       component: ItemDetailPage,
       componentProps: {
@@ -117,9 +114,6 @@ export class SearchPage implements OnInit {
     modal.onDidDismiss().then((dataReturned) => {
       if (dataReturned !== null) {
         console.log('Modal sent data: ', dataReturned);
-        this.subscription = this.platform.backButton.subscribe(() => {
-          this._location.back();
-        });
       }
     });
     return await modal.present();
@@ -145,13 +139,9 @@ export class SearchPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }

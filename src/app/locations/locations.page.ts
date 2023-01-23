@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Platform, ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
 import { Globals } from '../globals';
 import { format, formatDistance, isBefore } from 'date-fns';
@@ -18,7 +18,6 @@ export class LocationsPage implements OnInit {
 /*  url: string = this.globals.hours_locations_url; */
   url: string = this.globals.hours_locations_url;
   locations: any = [];
-  subscription: any;
   offline_updated: any;
 
   constructor(
@@ -26,7 +25,6 @@ export class LocationsPage implements OnInit {
     public toast: ToastService,
     public modalController: ModalController,
     private http: HttpClient,
-    private platform: Platform,
     private _location: Location,
     private storage: Storage,
   ) { }
@@ -62,7 +60,6 @@ export class LocationsPage implements OnInit {
   }
 
   async view_details(location:any) {
-    this.subscription.unsubscribe();
     const modal = await this.modalController.create({
       component: LocationDetailPage,
       componentProps: {
@@ -72,9 +69,6 @@ export class LocationsPage implements OnInit {
     modal.onDidDismiss().then((dataReturned) => {
       if (dataReturned !== null) {
         console.log('Modal sent data: ', dataReturned);
-        this.subscription = this.platform.backButton.subscribe(() => {
-          this._location.back();
-        });
       }
     });
     return await modal.present();
@@ -86,13 +80,9 @@ export class LocationsPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.subscription = this.platform.backButton.subscribe(() => {
-      this._location.back();
-    });
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }

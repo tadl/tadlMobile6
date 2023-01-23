@@ -27,7 +27,6 @@ export class FeaturedPage implements OnInit {
   size: string = "50";
   sort: string = "pubdateDESC";
   type: string = "shelving_location";
-  subscription: any;
 
   constructor(
     public globals: Globals,
@@ -98,7 +97,6 @@ export class FeaturedPage implements OnInit {
   }
 
   async details(item: any) {
-    this.subscription.unsubscribe();
     const modal = await this.modalController.create({
       component: ItemDetailPage,
       componentProps: {
@@ -121,7 +119,6 @@ export class FeaturedPage implements OnInit {
   }
 
   ionViewWillLeave() {
-    this.subscription.unsubscribe();
   }
 
 }
