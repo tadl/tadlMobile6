@@ -96,7 +96,6 @@ export class User {
       }
     });
     if (this.id) {
-      console.log('got here')
       let user = {
         hashed_password: this.hashed_password,
         username: this.username,
