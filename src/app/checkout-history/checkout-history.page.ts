@@ -37,6 +37,7 @@ export class CheckoutHistoryPage implements OnInit {
       }
     });
     return await modal.present();
+    this.globals.modal_open = true;
   }
 
   refresh_checkout_history(event:any) {

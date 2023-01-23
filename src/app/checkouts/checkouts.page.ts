@@ -35,6 +35,7 @@ export class CheckoutsPage implements OnInit {
       }
     });
     return await modal.present();
+    this.globals.modal_open = true;
   }
 
   refresh_checkouts(event: any) {

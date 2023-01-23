@@ -84,6 +84,7 @@ export class Globals {
   public api_loading: boolean = false;
   public net_status: string = "online";
   public net_type: string = "undefined";
+  public modal_open: boolean = false;
 
   /* Arrays and Maps to handle multi-location things */
   /* Used for changing pickup locations on holds */
@@ -244,6 +245,7 @@ export class Globals {
   async close_modal() {
     const onClosedData: string = "Wrapped up!";
     await this.modalController.dismiss(onClosedData);
+    this.modal_open = false;
   }
 
   /* api loading indicator */

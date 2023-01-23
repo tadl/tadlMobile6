@@ -72,6 +72,7 @@ export class LocationsPage implements OnInit {
       }
     });
     return await modal.present();
+    this.globals.modal_open = true;
   }
 
 

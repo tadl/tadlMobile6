@@ -34,6 +34,7 @@ export class HoldsPage implements OnInit {
       }
     });
     return await modal.present();
+    this.globals.modal_open = true;
   }
 
   refresh_holds(event: any) {
