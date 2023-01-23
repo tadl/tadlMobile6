@@ -34,11 +34,11 @@
               </ion-item>
             </div>
             <ion-item>
-              <ion-label>Username:</ion-label>
+              <ion-label position="floating">Username</ion-label>
               <ion-input [(ngModel)]="user.username"></ion-input>
             </ion-item>
             <ion-item>
-              <ion-label>Password:</ion-label>
+              <ion-label position="floating">Password</ion-label>
               <ion-input type="password" [(ngModel)]="user.password"></ion-input>
             </ion-item>
             <ion-button  expand="full" color="success" (click)="this.user.login(false)">Login</ion-button>
