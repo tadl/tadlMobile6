@@ -61,7 +61,7 @@ export class AppComponent {
       if (canGoBack) {
         window.history.back();
       } else {
-        App.exitApp();
+        this.globals.confirm_exit();
       }
     });
     this.platform.resume.subscribe(async () => {
