@@ -632,6 +632,7 @@ export class User {
           this.checkout_history = new_items;
         }
       }
+      this.events.publish('process_checkout_history_complete');
     },
     (err) => {
       this.globals.api_loading = false;

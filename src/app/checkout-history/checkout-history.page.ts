@@ -47,7 +47,11 @@ export class CheckoutHistoryPage implements OnInit {
   }
 
   refresh_checkout_history(event:any) {
-    return;
+    this.user.get_checkout_history();
+    let subscription = this.events.subscribe('process_checkout_history_complete', () => {
+      event.target.complete();
+      subscription.unsubscribe();
+    });
   }
 
   ngOnInit() {
