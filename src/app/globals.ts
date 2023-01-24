@@ -250,6 +250,7 @@ export class Globals {
   async go_back() {
     if (this.modal_open == true) {
       this.close_modal();
+      return;
     } else {
       window.history.back();
     }
@@ -260,13 +261,16 @@ export class Globals {
     this.api_loading = true;
   }
 
+  /* populate device_info */
   async getDeviceInfo() {
     this.device_info = await Device.getInfo();
   }
 
+  /* confirm exit */
   async confirm_exit() {
     if (this.modal_open == true) {
       this.close_modal();
+      return;
     } else {
       const alert = await this.alertController.create({
         header: 'Exit the app?',

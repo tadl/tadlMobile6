@@ -34,8 +34,8 @@ export class CheckoutsPage implements OnInit {
         console.log('Modal sent data: ', dataReturned);
       }
     });
-    return await modal.present();
     this.globals.modal_open = true;
+    return await modal.present();
   }
 
   refresh_checkouts(event: any) {
