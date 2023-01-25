@@ -2,7 +2,7 @@
   <ion-split-pane contentId="main-content">
     <ion-menu contentId="main-content" type="overlay" side="start">
       <ion-content>
-        <ion-list id="nav-list" class="ion-padding-top">
+        <ion-list id="nav-list">
           <ion-list-header>Main Menu</ion-list-header>
           <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
             <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
@@ -16,7 +16,7 @@
     <ion-router-outlet id="main-content"></ion-router-outlet>
     <ion-menu contentId="main-content" type="overlay" side="end">
       <ion-content>
-        <ion-list id="account-list" class="ion-padding-top ion-padding-bottom">
+        <ion-list id="account-list">
           <ion-list-header>Account Menu</ion-list-header>
           <div *ngIf="user.logged_in == false">
             <div *ngIf="user.stored_accounts_keys.length > 0">

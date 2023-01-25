@@ -5,6 +5,7 @@ import { Storage } from '@ionic/storage-angular';
 import { Network } from '@capacitor/network';
 import { fromEvent } from 'rxjs';
 import { Events } from './services/event.service';
+import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
 
@@ -29,6 +30,7 @@ export class AppComponent {
     public events: Events,
     public globals: Globals,
     public user: User,
+    public platform: Platform,
     private storage: Storage,
   ) {}
 
@@ -70,8 +72,15 @@ export class AppComponent {
         this.globals.confirm_exit();
       }
     });
-    App.addListener('resume', () => {
+    this.platform.resume.subscribe(async () => {
       this.user.autolog();
+    });
+    App.addListener('appStateChange', (state: any) => {
+      if (state.isActive) {
+        this.user.autolog();
+      } else {
+        console.log('App has become inactive');
+      }
     });
     this.user.autolog();
     fromEvent(document, 'didDismiss').subscribe(event => {
