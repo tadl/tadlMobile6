@@ -8,6 +8,7 @@ import { Events } from './services/event.service';
 import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +35,7 @@ export class AppComponent {
     private storage: Storage,
   ) {}
 
-  card_modal = false;
+  card_modal:boolean = false;
 
   show_card(isOpen: boolean) {
     this.card_modal = isOpen;
@@ -51,41 +52,45 @@ export class AppComponent {
     }
   }
 
-  async setup_storage(){
+  async setup_storage() {
     await this.storage.defineDriver(CordovaSQLiteDriver);
     await this.storage.create();
     this.events.publish('storage_setup_complete');
   }
 
-  ngOnInit() {
-    this.setup_storage()
-    this.getNetworkStatus();
-    this.user.autolog();
-    Network.addListener('networkStatusChange', status => {
+  async do_init() {
+    await this.platform.ready().then(() => {
+      this.setup_storage();
       this.getNetworkStatus();
-      console.log('Network status changed ', status);
-    });
-    App.addListener('backButton', ( { canGoBack }) => {
-      if (canGoBack) {
-        this.globals.go_back();
-      } else {
-        this.globals.confirm_exit();
-      }
-    });
-    this.platform.resume.subscribe(async () => {
       this.user.autolog();
-    });
-    App.addListener('appStateChange', (state: any) => {
-      if (state.isActive) {
+      Network.addListener('networkStatusChange', status => {
+        this.getNetworkStatus();
+        console.log('Network status changed ', status);
+      });
+      App.addListener('backButton', ( { canGoBack }) => {
+        if (canGoBack) {
+          this.globals.go_back();
+        } else {
+          this.globals.confirm_exit();
+        }
+      });
+      this.platform.resume.subscribe(async () => {
         this.user.autolog();
-      } else {
-        console.log('App has become inactive');
-      }
+      });
+      fromEvent(document, 'didDismiss').subscribe(event => {
+        this.card_modal = false;
+      });
+      this.globals.getDeviceInfo();
     });
-    this.user.autolog();
-    fromEvent(document, 'didDismiss').subscribe(event => {
-      this.card_modal = false;
+    await SplashScreen.hide();
+  }
+
+
+  ngOnInit() {
+    SplashScreen.show({
+      autoHide: false,
     });
-    this.globals.getDeviceInfo();
+    this.do_init();
+    console.log('init complete');
   }
 }
