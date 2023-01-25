@@ -8,7 +8,6 @@ import { Events } from './services/event.service';
 import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
-import { SplashScreen } from '@capacitor/splash-screen';
 
 @Component({
   selector: 'app-root',
