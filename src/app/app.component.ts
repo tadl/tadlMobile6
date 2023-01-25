@@ -82,14 +82,10 @@ export class AppComponent {
       });
       this.globals.getDeviceInfo();
     });
-    await SplashScreen.hide();
   }
 
 
   ngOnInit() {
-    SplashScreen.show({
-      autoHide: false,
-    });
     this.do_init();
     console.log('init complete');
   }
