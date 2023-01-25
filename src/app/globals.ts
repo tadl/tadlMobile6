@@ -44,6 +44,9 @@ export class Globals {
   public logo_url: string = '/assets/logo.png';
   public square_logo_url: string = '/assets/logo-clock-only.png';
 
+  /* melcat link */
+  public melcat_url: string = 'https://www.mel.org';
+
   /* catalog things */
   public catalog_schema: string = 'https://';
   public catalog_api_base: string = this.catalog_schema + this.catalog_host;

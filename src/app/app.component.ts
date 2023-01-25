@@ -3,7 +3,6 @@ import { Globals } from './globals';
 import { User } from './user';
 import { Storage } from '@ionic/storage-angular';
 import { Network } from '@capacitor/network';
-import { Platform } from '@ionic/angular';
 import { fromEvent } from 'rxjs';
 import { Events } from './services/event.service';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
@@ -30,7 +29,6 @@ export class AppComponent {
     public events: Events,
     public globals: Globals,
     public user: User,
-    public platform: Platform,
     private storage: Storage,
   ) {}
 
@@ -72,7 +70,7 @@ export class AppComponent {
         this.globals.confirm_exit();
       }
     });
-    this.platform.resume.subscribe(async () => {
+    App.addListener('resume', () => {
       this.user.autolog();
     });
     this.user.autolog();
