@@ -57,35 +57,30 @@ export class AppComponent {
     this.events.publish('storage_setup_complete');
   }
 
-  async do_init() {
-    await this.platform.ready().then(() => {
-      this.setup_storage();
-      this.getNetworkStatus();
-      this.user.autolog();
-      Network.addListener('networkStatusChange', status => {
-        this.getNetworkStatus();
-        console.log('Network status changed ', status);
-      });
-      App.addListener('backButton', ( { canGoBack }) => {
-        if (canGoBack) {
-          this.globals.go_back();
-        } else {
-          this.globals.confirm_exit();
-        }
-      });
-      this.platform.resume.subscribe(async () => {
-        this.user.autolog();
-      });
-      fromEvent(document, 'didDismiss').subscribe(event => {
-        this.card_modal = false;
-      });
-      this.globals.getDeviceInfo();
-    });
-  }
-
 
   ngOnInit() {
-    this.do_init();
-    console.log('init complete');
+    this.setup_storage()
+    this.getNetworkStatus();
+    this.user.autolog();
+    Network.addListener('networkStatusChange', status => {
+      this.getNetworkStatus();
+      console.log('Network status changed ', status);
+    });
+    App.addListener('backButton', ( { canGoBack }) => {
+      if (canGoBack) {
+        this.globals.go_back();
+      } else {
+        this.globals.confirm_exit();
+      }
+    });
+    this.platform.resume.subscribe(async () => {
+      this.user.autolog();
+    });
+    this.user.autolog();
+    fromEvent(document, 'didDismiss').subscribe(event => {
+      this.card_modal = false;
+    });
+    this.globals.getDeviceInfo();
   }
+
 }
