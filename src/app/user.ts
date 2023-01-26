@@ -241,17 +241,29 @@ export class User {
     this.storage.remove('username');
   }
 
-  get_checkouts(){
-    if(this.logged_in){
+  get_checkouts() {
+    if (this.logged_in) {
       let params = new HttpParams()
       .set("token", this.token)
       .set("v", "5");
       this.globals.loading_show();
       this.http.get(this.globals.catalog_checkouts_url, {params: params})
-        .subscribe({
-          next: (response) => this.process_checkouts(response),
-          error: (error) => this.show_error_message("Could not reach server. Please verify you have a data connection or try again later."),
-        });
+      .subscribe((data:any) => {
+        this.process_checkouts(data);
+      }, (err) => {
+        this.globals.api_loading = false;
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          const subscription = this.events.subscribe('action_retry', () => {
+            this.get_checkouts();
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
     }
   }
 
@@ -317,18 +329,30 @@ export class User {
     await actionSheet.present();
   }
 
-  get_holds(){
-    if(this.logged_in){
+  get_holds() {
+    if (this.logged_in) {
       this.globals.loading_show();
       let params = new HttpParams()
       .set("token", this.token)
       .set("v", "5");
       this.globals.loading_show();
       this.http.get(this.globals.catalog_holds_url, {params: params})
-        .subscribe({
-          next: (response) => this.process_holds(response),
-          error: (error) => this.show_error_message("Could not reach server. Please verify you have a data connection or try again later."),
-        });
+      .subscribe((data:any) => {
+        this.process_holds(data);
+      }, (err) => {
+        this.globals.api_loading = false;
+        if (this.action_retry == true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
+        } else {
+          this.action_retry = true;
+          const subscription = this.events.subscribe('action_retry', () => {
+            this.get_holds();
+            subscription.unsubscribe();
+          });
+          this.login(true);
+        }
+      });
     }
   }
 
@@ -647,9 +671,18 @@ export class User {
     },
     (err) => {
       this.globals.api_loading = false;
-      this.toast.presentToast(this.globals.server_error_msg);
+      if (this.action_retry == true) {
+        this.toast.presentToast(this.globals.server_error_msg);
+        this.action_retry = false;
+      } else {
+        this.action_retry = true;
+        let subscription = this.events.subscribe('action_retry', () => {
+          this.get_checkout_history();
+          subscription.unsubscribe();
+        });
+        this.login(true);
+      }
     });
   }
-
 
 }

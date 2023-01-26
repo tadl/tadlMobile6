@@ -61,7 +61,6 @@ export class AppComponent {
   ngOnInit() {
     this.setup_storage()
     this.getNetworkStatus();
-    this.user.autolog();
     Network.addListener('networkStatusChange', status => {
       this.getNetworkStatus();
       console.log('Network status changed ', status);
