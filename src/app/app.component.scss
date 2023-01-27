@@ -26,6 +26,7 @@ ion-menu.md ion-list#account-list {
   border-bottom: 1px solid var(--ion-color-step-150, #d7d8da);
 }
 
+ion-menu.md ion-list#nav-list ion-list-header,
 ion-menu.md ion-list#account-list ion-list-header {
   font-size: 22px;
   font-weight: 600;
@@ -60,7 +61,7 @@ ion-menu.ios ion-content {
 }
 
 ion-menu.ios ion-list {
-  padding: 20px 0 0 0;
+  padding: 40px 0 0 0;
 }
 
 ion-menu.ios ion-note {
