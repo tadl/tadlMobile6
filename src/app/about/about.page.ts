@@ -15,7 +15,6 @@ export class AboutPage implements OnInit {
 
   platforms: string = this.platform.platforms().join('/');
   storage_driver: string | null = this.storage.driver;
-  device_info: any = {};
 
   constructor(
     public globals: Globals,
@@ -26,12 +25,6 @@ export class AboutPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.getDeviceInfo();
-  }
-
-  async getDeviceInfo() {
-    this.device_info = await Device.getInfo();
-    console.log(this.device_info);
   }
 
   ionViewDidEnter() {

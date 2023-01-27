@@ -16,6 +16,8 @@ import { App } from '@capacitor/app';
 })
 export class AppComponent {
 
+  model: string = '';
+
   public appPages:any = [
     { title: 'Home', url: '/home', icon: 'home' },
     { title: 'Search', url: '/search', icon: 'search' },
