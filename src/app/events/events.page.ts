@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { ModalController, InfiniteScrollCustomEvent } from '@ionic/angular';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
+import { EventDetailPage } from '../event-detail/event-detail.page';
 
 @Component({
   selector: 'app-events',
@@ -42,6 +43,21 @@ export class EventsPage implements OnInit {
       });
   }
 
+  async view_details(event:any) {
+    const modal = await this.modalController.create({
+      component: EventDetailPage,
+      componentProps: {
+        "event": event,
+      }
+    });
+    modal.onDidDismiss().then((dataReturned) => {
+      if (dataReturned !== null) {
+        console.log('Modal sent data: ', dataReturned);
+      }
+    });
+    this.globals.modal_open = true;
+    return await modal.present();
+  }
 
   ngOnInit() {
     this.get_events(this.location);

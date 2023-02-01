@@ -67,6 +67,14 @@ const routes: Routes = [
     path: 'checkout-history',
     loadChildren: () => import('./checkout-history/checkout-history.module').then( m => m.CheckoutHistoryPageModule)
   },
+  {
+    path: 'event-detail',
+    loadChildren: () => import('./event-detail/event-detail.module').then( m => m.EventDetailPageModule)
+  },
+  {
+    path: 'news-detail',
+    loadChildren: () => import('./news-detail/news-detail.module').then( m => m.NewsDetailPageModule)
+  },
 ];
 
 @NgModule({

@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Event Detail</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="globals.close_modal()" class="button button-clear">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-grid class="ion-no-padding ion-no-margin">
+    <ion-row class="ion-no-padding ion-no-margin">
+      <ion-col size="12">
+        <h2 text-center [innerHTML]="event.title" class="ion-margin-horizontal ion-text-center"></h2>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <img *ngIf="event.image" [src]="event.image" class="ion-float-left" style="width:100%;margin:0 8px 5px 0;">
+        <div class="ion-padding-horizontal" [innerHTML]="event.description"></div>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-padding-horizontal">
+      <ion-col size="5">
+        <h2>WHEN</h2>
+        <div>{{ event.start_date | date:'EEEE' }}</div>
+        <div>{{ event.start_date | date:'LLLL d' }}</div>
+        <div>{{ event.start_date | date:'h:mm a' }}</div>
+      </ion-col>
+      <ion-col size="7">
+      <h2>WHERE</h2>
+        <div [innerHTML]="event.location"></div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ion-button expand="full" (click)="this.globals.open_page(event.url)">View full details</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>

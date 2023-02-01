@@ -4,6 +4,7 @@ import { ModalController } from '@ionic/angular';
 import { Location } from '@angular/common';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
+import { NewsDetailPage } from '../news-detail/news-detail.page';
 
 @Component({
   selector: 'app-news',
@@ -38,6 +39,22 @@ export class NewsPage implements OnInit {
       this.globals.api_loading = false;
         this.toast.presentToast(this.globals.server_error_msg);
     });
+  }
+
+  async view_details(news:any) {
+    const modal = await this.modalController.create({
+      component: NewsDetailPage,
+      componentProps: {
+        "news": news,
+      }
+    });
+    modal.onDidDismiss().then((dataReturned) => {
+      if (dataReturned !== null) {
+        console.log('Modal sent data: ', dataReturned);
+      }
+    });
+    this.globals.modal_open = true;
+    return await modal.present();
   }
 
   ngOnInit() {

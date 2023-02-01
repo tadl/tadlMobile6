@@ -38,7 +38,7 @@
       </ion-select>
     </ion-item>
 
-    <ion-item *ngFor="let event of this.web_events" (click)="this.globals.open_page(event.url)" detail="true">
+    <ion-item *ngFor="let event of this.web_events" (click)="view_details(event)" detail="true">
       <ion-thumbnail slot="start" *ngIf="event.image">
         <ion-img [src]="event.image"></ion-img>
       </ion-thumbnail>
@@ -50,10 +50,10 @@
           <h2 [innerHTML]="event.title"></h2>
         </ion-text>
         <ion-text>
-          <p [innerHTML]="globals.format_date(event.start_date, 'event')"></p>
+          <p>{{ event.start_date | date:'EEE LLLL d, h:mm a' }}</p>
         </ion-text>
-        <ion-text color="medium" *ngIf="event.branch">
-          <p>{{event.branchname}}</p>
+        <ion-text color="medium" *ngIf="event.location">
+          <p [innerHTML]="event.location"></p>
         </ion-text>
       </ion-label>
     </ion-item>

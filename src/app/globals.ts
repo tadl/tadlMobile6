@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AlertController, Platform, ModalController, MenuController } from '@ionic/angular';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { Browser } from '@capacitor/browser';
 import { Device } from '@capacitor/device';
 import { App } from '@capacitor/app';
@@ -187,21 +187,6 @@ export class Globals {
     await Browser.open({ url: url });
   }
 
-  /* date formatter */
-  format_date(str:string, fmt?:string) {
-    if (fmt == "event") {
-      return format(parseISO(str), 'EEE LLLL do, h:mm a');
-    } else if (fmt == "eventdetailday") {
-      return format(parseISO(str), 'EEEE');
-    } else if (fmt == "eventdetaildate") {
-      return format(parseISO(str), 'LLLL do');
-    } else if (fmt == "eventdetailtime") {
-      return format(parseISO(str), 'h:mm a');
-    } else if (fmt == "news") {
-      return format(parseISO(str), 'LLLL do, h:mm a');
-    } else return null;
-  }
-
   /* returns today's day, for displaying hours today */
   day_today() {
     return format(new Date(), 'EEEE');
@@ -290,6 +275,10 @@ export class Globals {
       });
       await alert.present();
     }
+  }
+
+  replacebreaks(str:string) {
+    return str.replace(/\n/g, '<br>');
   }
 
 }
