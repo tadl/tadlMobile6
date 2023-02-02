@@ -15,7 +15,8 @@
   <ion-grid>
     <ion-row *ngIf="user.logged_in == true">
       <ion-col size="12" margin-top>
-        <img [src]="globals.square_logo_url" class="logo-auth">
+        <img *ngIf="!globals.system_color.matches" [src]="globals.square_logo_url" class="logo-auth">
+        <img *ngIf="globals.system_color.matches" [src]="globals.square_logo_url_dark" class="logo-auth">
         <h5 *ngIf="user.full_name" class="user-greeting">Logged in as {{ user.username }}</h5>
         <p *ngIf="user.checkout_count > 0 || user.holds_count > 0 || user.fines_exist == true" text-wrap class="user-details">
           You have<span *ngIf="user.checkout_count > 0"> {{ user.checkout_count }} item<span *ngIf="user.checkout_count != 1">s</span> checked out<span *ngIf="user.overdue > 0"> ({{ user.overdue }} overdue)</span></span><span *ngIf="user.holds_count == 0 && user.fines_exist == false">.</span><span *ngIf="user.checkout_count > 0 && user.holds_count > 0">,</span><span *ngIf="user.holds_count > 0"> {{ user.holds_count }} item<span *ngIf="user.holds_count != 1">s</span> on hold<span *ngIf="user.holds_ready_count > 0"> ({{ user.holds_ready_count }} ready for pickup!)</span><span *ngIf="user.holds_ready_count == 0 && user.fines_exist == false">.</span><span *ngIf="user.fines_exist == true"><span *ngIf="user.checkout_count > 0 || user.holds_count > 0"> and</span> ${{ user.fines_amount }} in fines.</span></span>
@@ -25,7 +26,8 @@
     <ion-row *ngIf="user.logged_in == false">
       <ion-col size="12">
         <p class="ion-text-center">
-          <img [src]="globals.logo_url" class="logo-noauth">
+          <img *ngIf="!globals.system_color.matches" [src]="globals.logo_url" class="logo-noauth">
+          <img *ngIf="globals.system_color.matches" [src]="globals.logo_url_dark" class="logo-noauth">
         </p>
       </ion-col>
     </ion-row>

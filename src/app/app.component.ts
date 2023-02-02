@@ -82,6 +82,10 @@ export class AppComponent {
       this.card_modal = false;
     });
     this.globals.getDeviceInfo();
+    let theme = window.matchMedia("(prefers-color-scheme: dark)");
+    theme.addEventListener('change', function(event) {
+      console.log('theme changed');
+    });
   }
 
 }

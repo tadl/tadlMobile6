@@ -26,6 +26,7 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit() {
+    console.log('dark ' + this.globals.system_color.matches);
   }
 
 }

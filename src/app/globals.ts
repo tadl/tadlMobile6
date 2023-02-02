@@ -22,6 +22,7 @@ export class Globals {
   public update_version: string = '2023020100';
 
   public device_info: any;
+  public system_color: any = window.matchMedia("(prefers-color-scheme: dark)");
 
   /* basic information */
   public catalog_host: string = 'apiv4.catalog.tadl.org'; /* hostname for catalog api */
@@ -42,7 +43,9 @@ export class Globals {
 
   /* static assets */
   public logo_url: string = '/assets/logo.png';
+  public logo_url_dark: string = '/assets/logo-dark.png';
   public square_logo_url: string = '/assets/logo-clock-only.png';
+  public square_logo_url_dark: string = '/assets/logo-clock-only-dark.png';
 
   /* melcat link */
   public melcat_url: string = 'https://www.mel.org';
