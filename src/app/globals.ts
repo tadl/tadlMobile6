@@ -18,8 +18,8 @@ export class Globals {
   /* CUSTOMIZABLE VARIABLES */
 
   /* app version */
-  public app_version: string = '6.0.9';
-  public update_version: string = '2023020200';
+  public app_version: string = '6.1.0';
+  public update_version: string = '2023071700';
 
   public device_info: any;
   public system_color: any = window.matchMedia("(prefers-color-scheme: dark)");
@@ -28,7 +28,7 @@ export class Globals {
   public catalog_host: string = 'apiv4.catalog.tadl.org'; /* hostname for catalog api */
   public catalog_covers_host: string = 'catalog.tadl.org'; /* hostname for catalog extras */
   public website_host: string = 'www.tadl.org'; /* hostname for website */
-  public tools_host: string = 'tools.app.tadl.org'; /* hostname for tools TODO: UPDATE */
+  public tools_host: string = 'tools.tadl.org'; /* hostname for tools */
   public system_short_name: string = 'TADL';
   public all_locations_value: string = '22';
 
@@ -79,11 +79,11 @@ export class Globals {
 
   /* website things */
   public website_schema: string = 'https://';
-  public events_api_url: string = this.website_schema + this.tools_host + '/mobile_events.json';
+  public events_api_url: string = this.website_schema + this.tools_host + '/v2/mobile_events.json';
 
-  public news_api_url: string = this.website_schema + this.tools_host + '/posts';
+  public news_api_url: string = this.website_schema + this.tools_host + '/v2/posts';
 
-  public hours_locations_url: string = this.website_schema + this.tools_host + '/locations.json?group=tadl';
+  public hours_locations_url: string = this.website_schema + this.tools_host + '/v2/locations.json?group=tadl';
   public pay_fines_url: string = this.website_schema + this.website_host + '/pay/pay.cgi'; /* redirected by nginx */
 
   /* global vars */
