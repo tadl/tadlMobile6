@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace "org.TADL.TADLMobile"
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "org.TADL.TADLMobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 60101
-        versionName "6.1.1"
+        versionCode 60102
+        versionName "6.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
