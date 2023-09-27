@@ -34,7 +34,11 @@ export class AppComponent {
     public user: User,
     public platform: Platform,
     private storage: Storage,
-  ) {}
+  ){
+    if (this.globals.system_short_name === 'TADL') {
+      this.appPages.splice(2, 0, { title: 'Suggest an Item', url: '/suggest-item', icon: 'bulb' });
+    }
+  }
 
   card_modal:boolean = false;
 

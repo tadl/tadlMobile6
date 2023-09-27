@@ -16,7 +16,7 @@ export class User {
   password: any = ''
   hashed_password: any = ''
   logged_in: boolean = false;
-  full_name: string;
+  full_name: string = '';
   ils_username: string;
   checkout_count: number;
   checkouts: Array<any> = [];
@@ -26,13 +26,13 @@ export class User {
   overdue: number;
   fines_amount: string;
   fines_exist: boolean = false;
-  card: string;
+  card: string = '';
   token: string;
   default_pickup: string;
   id: number;
   fines: any;
   action_retry: any;
-  preferences: any;
+  preferences: any = '';
   item: any = {};
   stored_accounts: any = {};
   stored_accounts_keys: Array<string> = [];

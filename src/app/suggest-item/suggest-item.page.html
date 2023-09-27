@@ -1,0 +1,75 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-progress-bar *ngIf="globals.api_loading" type="indeterminate"></ion-progress-bar>
+    <ion-title>Suggest an Item</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button menu="end"><ion-icon name="person-circle"></ion-icon></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-text class="intro-text" *ngIf="!show_confirmation">
+    <p>Please complete the following form to suggest an item. Thanks!</p>
+  </ion-text>
+  <form *ngIf="!show_confirmation" #suggestion_form="ngForm" (ngSubmit)="submit_suggestion()">
+    <ion-list>
+      <!-- Item Title -->
+      <ion-item>
+        <ion-label position="floating">Title *</ion-label>
+        <ion-input [(ngModel)]="item_title" name="item_title" required></ion-input>
+      </ion-item>
+
+      <!-- Author Name -->
+      <ion-item>
+        <ion-label position="floating">Author / Artist *</ion-label>
+        <ion-input [(ngModel)]="author_name" name="author_name" required></ion-input>
+      </ion-item>
+
+      <!-- Preferred Format -->
+      <ion-item>
+        <ion-label>Preferred Format *</ion-label>
+        <ion-select [(ngModel)]="preferred_format" name="preferred_format" interface="popover"  required>
+          <ion-select-option value="print">Print</ion-select-option>
+          <ion-select-option value="large print">Large Print</ion-select-option>
+          <ion-select-option value="audiobook">Audiobook</ion-select-option>
+          <ion-select-option value="music">CD</ion-select-option>
+          <ion-select-option value="video">DVD</ion-select-option>
+          <ion-select-option value="other">Other</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Name -->
+      <ion-item>
+        <ion-label position="floating">Your Name *</ion-label>
+        <ion-input [(ngModel)]="this.patron_name" name="name" required></ion-input>
+      </ion-item>
+
+      <!-- Email -->
+      <ion-item>
+        <ion-label position="floating">Your Email *</ion-label>
+        <ion-input [(ngModel)]="this.patron_email " name="email" type="email" required></ion-input>
+      </ion-item>
+
+      <!-- Library Card Number -->
+      <ion-item>
+        <ion-label position="floating">Library Card Number</ion-label>
+        <ion-input [(ngModel)]="this.patron_card" name="card_number"></ion-input>
+      </ion-item>
+
+      <!-- Submit Button -->
+      <ion-button expand="full" type="submit" [disabled]="!suggestion_form.valid || show_confirmation">Submit</ion-button>
+    </ion-list>
+  </form>
+
+  <div *ngIf="show_confirmation" class="confirmation-container">
+    <ion-text class="confirmation-text">
+      <p>Thank you for your suggestion! We'll review it shortly.</p>
+    </ion-text>
+    <ion-button expand="full" (click)="reset_form()">Suggest Another Item</ion-button>
+  </div>
+
+</ion-content>
