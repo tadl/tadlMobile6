@@ -28,7 +28,7 @@ export class SuggestItemPage implements OnInit {
   author_name: string;
   preferred_format: string;
   show_confirmation: boolean = false;
-  suggest_item_url = 'https://catalog.tadl.org/main/suggest_an_item.json'
+  suggest_item_url = this.globals.suggestions_url;
   patron_name: string = this.user.full_name; 
   patron_email: string = this.user.preferences.email;
   patron_card: string = this.user.card;

@@ -29,6 +29,7 @@ export class Globals {
   public catalog_covers_host: string = 'catalog.tadl.org'; /* hostname for catalog extras */
   public website_host: string = 'www.tadl.org'; /* hostname for website */
   public tools_host: string = 'tools.tadl.org'; /* hostname for tools */
+  public suggestions_url: string = 'https://catalog.tadl.org/main/suggest_an_item.json'; /* URL for suggestions */
   public system_short_name: string = 'TADL';
   public all_locations_value: string = '22';
 
