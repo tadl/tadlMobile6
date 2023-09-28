@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Events } from '../services/event.service';
 import { ActionSheetController, AlertController } from '@ionic/angular';
-import { Location } from '@angular/common';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
 import { Globals } from '../globals';
 import { User } from '../user';
@@ -12,6 +11,7 @@ import { User } from '../user';
   templateUrl: './suggest-item.page.html',
   styleUrls: ['./suggest-item.page.scss'],
 })
+
 export class SuggestItemPage implements OnInit {
 
   constructor(
@@ -58,9 +58,6 @@ export class SuggestItemPage implements OnInit {
     this.show_confirmation = false;
   }
 
-
-
   ngOnInit() {
   }
-
 }
