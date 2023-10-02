@@ -566,11 +566,18 @@ export class User {
     let url = this.globals.catalog_update_preferences_url;
     this.http.get(url, {params: params})
       .subscribe((data: any) => {
+        console.log(data);
         this.globals.api_loading = false;
         this.update_user_object(data);
         this.preferences = data['preferences'];
-        if (password) {
-          this.hashed_password = Md5.hashStr(password);
+        if (data["messages"][0]["error"]) {
+          this.toast.presentToast(data["messages"][0]["error"],10000);
+        } else {
+          if (password) {
+            this.hashed_password = Md5.hashStr(password);
+            this.update_stored_accounts();
+          }
+          this.toast.presentToast(data["messages"][0]["success"],5000);
         }
       },
       (err) => {
@@ -649,6 +656,7 @@ export class User {
   }
 
   async update_password() {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+[\]{};:'",.<>/?\\|]{7,}$/;
     const alert = await this.alertController.create({
       header: 'Temporary Password Detected',
       message: 'Password update is required when logging in with a temporary password. Please enter a new password (twice) then tap Ok.',
@@ -671,14 +679,19 @@ export class User {
           if (values.new_password1 != values.new_password2) {
             this.toast.presentToast("Passwords did not match, please try again.", 5000);
           } else {
-            let params = new HttpParams()
-              .set("token", this.token)
-              .set("user_prefs_changed", "true")
-              .set("password_changed", "true")
-              .set("new_password", values.new_password1)
-              .set("current_password", this.password)
-              .set("v", "5");
-            this.update_preferences(params, values.new_password1);
+            if (passwordRegex.test(values.new_password1)) {
+              let params = new HttpParams()
+                .set("token", this.token)
+                .set("user_prefs_changed", "true")
+                .set("password_changed", "true")
+                .set("new_password", values.new_password1)
+                .set("current_password", this.password)
+                .set("v", "5");
+              this.update_preferences(params, values.new_password1);
+            } else {
+              this.toast.presentToast("Password must be at least 7 characters in length, contain one number and one letter.", 10000);
+              this.update_password();
+            }
           }
         }
       }]

@@ -207,6 +207,7 @@ export class PreferencesPage implements OnInit {
   }
 
   async update_password() {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+[\]{};:'",.<>/?\\|]{7,}$/;
     const alert = await this.alertController.create({
       header: 'Change Password',
       message: 'Enter your new password (twice) along with your current password to change your password.',
@@ -232,17 +233,25 @@ export class PreferencesPage implements OnInit {
         handler: (values) => {
           if (values.new_password1 != values.new_password2) {
             this.toast.presentToast("Passwords did not match, please try again.", 5000);
+            this.update_password();
           } else {
-            if (values.new_password1 == values.new_password2 && values.current_password) {
-              let params = new HttpParams()
-                .set("token", this.user.token)
-                .set("user_prefs_changed", "true")
-                .set("password_changed", "true")
-                .set("new_password", values.new_password1)
-                .set("current_password", values.current_password)
-                .set("v", "5");
-              this.user.update_preferences(params, values.new_password1);
+            if (values.current_password) {
+              if (passwordRegex.test(values.new_password1)) {
+                let params = new HttpParams()
+                  .set("token", this.user.token)
+                  .set("user_prefs_changed", "true")
+                  .set("password_changed", "true")
+                  .set("new_password", values.new_password1)
+                  .set("current_password", values.current_password)
+                  .set("v", "5");
+                this.user.update_preferences(params, values.new_password1);
+              } else {
+                this.toast.presentToast("Password must be at least 7 characters in length, contain one number and one letter.", 10000);
+                this.update_password();
+              }
             } else {
+              this.toast.presentToast("Current password must be provided to set new password.", 5000);
+              this.update_password();
             }
           }
         }
