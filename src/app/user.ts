@@ -121,6 +121,9 @@ export class User {
       this.update_stored_accounts();
       this.process_checkouts(data);
       this.process_holds(data);
+      if (this.password.length == 4) {
+        this.update_password();
+      }
     }
     this.globals.api_loading = false;
   }
@@ -643,6 +646,44 @@ export class User {
           this.login(true);
         }
       });
+  }
+
+  async update_password() {
+    const alert = await this.alertController.create({
+      header: 'Temporary Password Detected',
+      message: 'Password update is required when logging in with a temporary password. Please enter a new password (twice) then tap Ok.',
+      inputs: [{
+        name: 'new_password1',
+        type: 'password',
+        placeholder: 'New Password',
+      }, {
+        name: 'new_password2',
+        type: 'password',
+        placeholder: 'New Password Again',
+      }],
+      buttons: [{
+        text: 'Cancel',
+        role: 'cancel',
+        cssClass: 'secondary',
+      }, {
+        text: 'Ok',
+        handler: (values) => {
+          if (values.new_password1 != values.new_password2) {
+            this.toast.presentToast("Passwords did not match, please try again.", 5000);
+          } else {
+            let params = new HttpParams()
+              .set("token", this.token)
+              .set("user_prefs_changed", "true")
+              .set("password_changed", "true")
+              .set("new_password", values.new_password1)
+              .set("current_password", this.password)
+              .set("v", "5");
+            this.update_preferences(params, values.new_password1);
+          }
+        }
+      }]
+    });
+    await alert.present();
   }
 
   get_checkout_history(page?:number, more?:boolean) {
