@@ -577,7 +577,9 @@ export class User {
             this.hashed_password = Md5.hashStr(password);
             this.update_stored_accounts();
           }
-          this.toast.presentToast(data["messages"][0]["success"],5000);
+          if ((data["messages"][0]["type"] != "circ_prefs") && (data["messages"][0]["type"] != "notify_prefs")) {
+            this.toast.presentToast(data["messages"][0]["success"],5000);
+          }
         }
       },
       (err) => {
