@@ -72,7 +72,7 @@ export class Globals {
   public catalog_update_preferences_url: string = this.catalog_api_base + '/update_preferences.json';
   public catalog_password_reset_url: string = this.catalog_api_base + '/submit_password_reset.json';
   public catalog_square_covers_url: string = this.catalog_api_base + '/';
-  public suggestions_url: string = this.catalog_covers_base + '/main/suggest_an_item.json'; /* URL for suggestions */
+  public suggestions_url: string = 'https://catalog.tadl.org/main/suggest_an_item.json'; /* URL for suggestions */
 
   public catalog_covers_small: string = this.catalog_covers_base + '/small/r/';
   public catalog_covers_medium: string = this.catalog_covers_base + '/medium/r/';
