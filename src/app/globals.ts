@@ -18,8 +18,8 @@ export class Globals {
   /* CUSTOMIZABLE VARIABLES */
 
   /* app version */
-  public app_version: string = '6.3.2';
-  public update_version: string = '2024091201';
+  public app_version: string = '6.3.3';
+  public update_version: string = '2024121000';
 
   public device_info: any;
   public system_color: any = window.matchMedia("(prefers-color-scheme: dark)");

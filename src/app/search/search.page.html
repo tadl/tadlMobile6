@@ -100,7 +100,7 @@
           <p>
             <ion-icon [name]="globals.item_type.get(result.type_of_resource)"></ion-icon>
             <ion-text *ngIf="!result.electronic" [color]="(result.availability.copies_all_available > 0) ? 'primary' : 'dark'"> {{ result.availability.copies_all_available }} available </ion-text>
-            <ion-text color="dark" *ngIf="!result.electronic && result.holdings[0].call_number"> / {{ result.holdings[0].call_number }} </ion-text>
+            <ion-text color="dark" *ngIf="!result.electronic && result.holdings[0]"> / {{ result.holdings[0].call_number }} </ion-text>
             <ion-text color="dark" *ngIf="result.electronic"> Electronic resource from {{ result.source }} </ion-text>
           </p>
         </ion-text>
