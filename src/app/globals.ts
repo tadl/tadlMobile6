@@ -18,7 +18,7 @@ export class Globals {
   /* CUSTOMIZABLE VARIABLES */
 
   /* app version */
-  public app_version: string = '6.3.4';
+  public app_version: string = '6.3.5';
   public update_version: string = '2025081800';
 
   public device_info: any;
