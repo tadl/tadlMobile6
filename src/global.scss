@@ -28,3 +28,7 @@
 ion-popover [popover]:not(:popover-open):not(dialog[open]) {
     display: contents;
 }
+
+ion-header, ion-toolbar { padding-top: var(--ion-safe-area-top, 0); }
+ion-content { --padding-top: var(--ion-safe-area-top, 0); }
+ion-menu ion-content { --padding-top: var(--ion-safe-area-top, 0); }
