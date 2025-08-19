@@ -3,9 +3,13 @@ package org.TADL.TADLMobile;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.getcapacitor.BridgeActivity;
@@ -17,10 +21,29 @@ public class MainActivity extends BridgeActivity {
     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     super.onCreate(savedInstanceState);
 
-    // Do NOT draw behind system bars; Android will inset content for us
+    // Do NOT draw behind system bars; let Android inset content
     WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
-    // Optional extra guard (some OEMs): ensure the WebView honors insets
+    // Clear any lingering layout flags (prevents accidental fullscreen/overlay)
+    getWindow().getDecorView().setSystemUiVisibility(0);
+
+    // Extra guard: ensure the root content gets at least status-bar padding
+    final View root = findViewById(android.R.id.content);
+    if (root != null) {
+      ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+        Insets sb = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+        int wantTop = sb.top;
+        int haveTop = v.getPaddingTop();
+        // Only increase padding if it's less than the inset (avoid double padding)
+        if (haveTop < wantTop) {
+          v.setPadding(v.getPaddingLeft(), wantTop, v.getPaddingRight(), v.getPaddingBottom());
+        }
+        return insets; // don't consume; let children handle if desired
+      });
+      ViewCompat.requestApplyInsets(root);
+    }
+
+    // Also ensure the WebView itself participates in insets
     if (getBridge() != null && getBridge().getWebView() != null) {
       getBridge().getWebView().setFitsSystemWindows(true);
     }
@@ -53,12 +76,13 @@ public class MainActivity extends BridgeActivity {
 
   private void applyStatusBarAppearance() {
     final boolean night = isNight();
+
     // Icon/text contrast (Compat works API 21–35)
     WindowInsetsControllerCompat controller =
         new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
     controller.setAppearanceLightStatusBars(!night); // dark icons in light mode; light in dark
 
-    // Solid bar color (works when not edge-to-edge)
+    // Solid bar color (since we're not drawing edge-to-edge)
     getWindow().setStatusBarColor(night ? Color.parseColor("#121212") : Color.WHITE);
   }
 }
