@@ -43,7 +43,6 @@ export class AppComponent {
   }
 
   card_modal:boolean = false;
-
   show_card(isOpen: boolean) { this.card_modal = isOpen; }
 
   async getNetworkStatus() {
@@ -58,16 +57,20 @@ export class AppComponent {
     this.events.publish('storage_setup_complete');
   }
 
+  // === Status bar control (Android): JS owns both background and icon color ===
   private async configureChrome() {
     try {
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
       if (this.platform.is('android')) {
         await StatusBar.setOverlaysWebView({ overlay: false });
-        await StatusBar.show(); // ensure status bar is visible
-        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        await StatusBar.show();
+        // Background color that matches your themes
+        await StatusBar.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
+        // Icons: light on dark, dark on light
         await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
       } else {
-        // iOS
-        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // iOS: keep as before
         await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
       }
     } catch (e) {
