@@ -9,7 +9,6 @@ import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 
 @Component({
   selector: 'app-root',
@@ -57,20 +56,17 @@ export class AppComponent {
     this.events.publish('storage_setup_complete');
   }
 
-  // === Status bar control (Android): JS owns both background and icon color ===
   private async configureChrome() {
     try {
       const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
       if (this.platform.is('android')) {
+        // Let the native theme handle bar color + icon contrast (Day/Night).
         await StatusBar.setOverlaysWebView({ overlay: false });
         await StatusBar.show();
-        // Background color that matches your themes
-        await StatusBar.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
-        // Icons: light on dark, dark on light
-        await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
+        // IMPORTANT: do NOT call setStyle or setBackgroundColor on Android
       } else {
-        // iOS: keep as before
+        // iOS: ok to style from JS
         await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
       }
     } catch (e) {
