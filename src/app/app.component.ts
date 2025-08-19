@@ -9,6 +9,7 @@ import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 
 @Component({
   selector: 'app-root',
@@ -59,6 +60,8 @@ export class AppComponent {
   private async configureChrome() {
     try {
       if (this.platform.is('android')) {
+        try { await EdgeToEdge.disable(); } catch {}
+        await StatusBar.setOverlaysWebView({ overlay: false });
         return;
       } else {
         const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;

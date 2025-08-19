@@ -14,11 +14,16 @@ public class MainActivity extends BridgeActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    // Follow system light/dark so uiMode is accurate
     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     super.onCreate(savedInstanceState);
 
+    // Do NOT draw behind system bars; Android will inset content for us
     WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+
+    // Optional extra guard (some OEMs): ensure the WebView honors insets
+    if (getBridge() != null && getBridge().getWebView() != null) {
+      getBridge().getWebView().setFitsSystemWindows(true);
+    }
 
     applyStatusBarAppearance();
   }
@@ -48,15 +53,12 @@ public class MainActivity extends BridgeActivity {
 
   private void applyStatusBarAppearance() {
     final boolean night = isNight();
-
-    // Set icon/text contrast (Compat works across API 21–35)
+    // Icon/text contrast (Compat works API 21–35)
     WindowInsetsControllerCompat controller =
         new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
     controller.setAppearanceLightStatusBars(!night); // dark icons in light mode; light in dark
 
-    // On Android 15+ statusBarColor is ignored when drawing edge-to-edge,
-    // but since we are NOT edge-to-edge (decorFits=true), we can give the bar a solid color.
-    // This keeps appearance consistent on older Android too.
+    // Solid bar color (works when not edge-to-edge)
     getWindow().setStatusBarColor(night ? Color.parseColor("#121212") : Color.WHITE);
   }
 }
