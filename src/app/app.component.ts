@@ -59,8 +59,7 @@ export class AppComponent {
   private async configureChrome() {
     try {
       if (this.platform.is('android')) {
-        await StatusBar.setOverlaysWebView({ overlay: false });
-        // Do NOT call StatusBar.show(), setStyle or setBackgroundColor on Android
+        return;
       } else {
         const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
