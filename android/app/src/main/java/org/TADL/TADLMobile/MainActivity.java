@@ -16,10 +16,8 @@ public class MainActivity extends BridgeActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // Do NOT draw behind system bars; inset content (keeps taps sane if bars reappear)
     WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
-    // Make sure the window isn’t translucent; color is irrelevant when hidden
     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     if (Build.VERSION.SDK_INT >= 21) {
       getWindow().setStatusBarColor(0xFF000000);
@@ -29,7 +27,7 @@ public class MainActivity extends BridgeActivity {
   }
 
   @Override
-  protected void onResume() {
+  public void onResume() {
     super.onResume();
     hideStatusBar();
   }
@@ -46,7 +44,6 @@ public class MainActivity extends BridgeActivity {
     if (Build.VERSION.SDK_INT >= 30) {
       final WindowInsetsController controller = getWindow().getInsetsController();
       if (controller != null) {
-        // Let users swipe to *temporarily* reveal bars; they’ll auto-hide again
         controller.setSystemBarsBehavior(
             WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         );
@@ -57,7 +54,7 @@ public class MainActivity extends BridgeActivity {
       int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY; // transient reveal, then auto-hide
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
       decor.setSystemUiVisibility(flags);
     }
   }
