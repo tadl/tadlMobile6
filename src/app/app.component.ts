@@ -58,15 +58,11 @@ export class AppComponent {
 
   private async configureChrome() {
     try {
-      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
       if (this.platform.is('android')) {
-        // Let the native theme handle bar color + icon contrast (Day/Night).
         await StatusBar.setOverlaysWebView({ overlay: false });
-        await StatusBar.show();
-        // IMPORTANT: do NOT call setStyle or setBackgroundColor on Android
+        // Do NOT call StatusBar.show(), setStyle or setBackgroundColor on Android
       } else {
-        // iOS: ok to style from JS
+        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
       }
     } catch (e) {
