@@ -9,6 +9,7 @@ import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,7 @@ export class AppComponent {
 
   model: string = '';
 
-  public appPages: any = [
+  public appPages:any = [
     { title: 'Home', url: '/home', icon: 'home' },
     { title: 'Search', url: '/search', icon: 'search' },
     { title: 'Locations', url: '/locations', icon: 'compass' },
@@ -35,13 +36,13 @@ export class AppComponent {
     public user: User,
     public platform: Platform,
     private storage: Storage,
-  ) {
+  ){
     if (this.globals.system_short_name === 'TADL') {
       this.appPages.splice(2, 0, { title: 'Suggest an Item', url: '/suggest-item', icon: 'bulb' });
     }
   }
 
-  card_modal: boolean = false;
+  card_modal:boolean = false;
 
   show_card(isOpen: boolean) {
     this.card_modal = isOpen;
@@ -59,35 +60,26 @@ export class AppComponent {
     this.events.publish('storage_setup_complete');
   }
 
-  /**
-   * Ensure the WebView is laid out BELOW the status bar (no overlay),
-   * and set icon/text color based on system theme.
-   */
-  private async configureStatusBar() {
+  private async configureChrome() {
     try {
-      if (this.platform.is('android') || this.platform.is('ios')) {
-        // Do not draw under the status bar – fixes menus appearing under it
-        await StatusBar.setOverlaysWebView({ overlay: false });
+      // Ensure WebView is below system bars (Pixel 9 / Android 15)
+      await EdgeToEdge.disable();
 
-        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      // Also ensure Capacitor StatusBar doesn’t overlay the WebView
+      await StatusBar.setOverlaysWebView({ overlay: false });
 
-        // On Android, give the bar a solid background; iOS ignores this call safely.
-        await StatusBar.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
-
-        // Icon/text color: light icons on dark bg; dark icons on light bg
-        await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
-      }
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      await StatusBar.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
+      await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
     } catch (e) {
-      console.log('StatusBar configuration skipped/failed:', e);
+      console.log('StatusBar/EdgeToEdge configuration skipped:', e);
     }
   }
 
   ngOnInit() {
     this.setup_storage();
     this.getNetworkStatus();
-    Network.addListener('networkStatusChange', () => {
-      this.getNetworkStatus();
-    });
+    Network.addListener('networkStatusChange', () => this.getNetworkStatus());
 
     App.addListener('backButton', ({ canGoBack }) => {
       if (canGoBack) {
@@ -97,12 +89,10 @@ export class AppComponent {
       }
     });
 
-    // Configure status bar once platform is ready
-    this.platform.ready().then(() => this.configureStatusBar());
+    this.platform.ready().then(() => this.configureChrome());
 
-    // Re-apply on resume (theme or OS UI may have changed)
     this.platform.resume.subscribe(async () => {
-      await this.configureStatusBar();
+      await this.configureChrome();
       this.user.autolog();
     });
 
@@ -114,10 +104,7 @@ export class AppComponent {
 
     this.globals.getDeviceInfo();
 
-    // Update status bar style if system theme changes while app is running
     const theme = window.matchMedia('(prefers-color-scheme: dark)');
-    theme.addEventListener('change', () => {
-      this.configureStatusBar();
-    });
+    theme.addEventListener('change', () => this.configureChrome());
   }
 }
