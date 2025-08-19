@@ -44,9 +44,7 @@ export class AppComponent {
 
   card_modal:boolean = false;
 
-  show_card(isOpen: boolean) {
-    this.card_modal = isOpen;
-  }
+  show_card(isOpen: boolean) { this.card_modal = isOpen; }
 
   async getNetworkStatus() {
     const status = await Network.getStatus();
@@ -60,17 +58,21 @@ export class AppComponent {
     this.events.publish('storage_setup_complete');
   }
 
+  /**
+   * Android: hide the status bar so content never sits underneath (Pixel 9 fix).
+   * iOS: keep the bar visible and styled.
+   */
   private async configureChrome() {
     try {
-      // Ensure WebView is below system bars (Pixel 9 / Android 15)
+      // Ensure WebView is not laid out under system bars
       await EdgeToEdge.disable();
 
-      // Also ensure Capacitor StatusBar doesn’t overlay the WebView
-      await StatusBar.setOverlaysWebView({ overlay: false });
-
-      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      await StatusBar.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
-      await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
+      if (this.platform.is('android')) {
+        await StatusBar.hide();
+      } else {
+        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
+      }
     } catch (e) {
       console.log('StatusBar/EdgeToEdge configuration skipped:', e);
     }
@@ -82,11 +84,8 @@ export class AppComponent {
     Network.addListener('networkStatusChange', () => this.getNetworkStatus());
 
     App.addListener('backButton', ({ canGoBack }) => {
-      if (canGoBack) {
-        this.globals.go_back();
-      } else {
-        this.globals.confirm_exit();
-      }
+      if (canGoBack) this.globals.go_back();
+      else this.globals.confirm_exit();
     });
 
     this.platform.ready().then(() => this.configureChrome());
@@ -98,9 +97,7 @@ export class AppComponent {
 
     this.user.autolog();
 
-    fromEvent(document, 'didDismiss').subscribe(() => {
-      this.card_modal = false;
-    });
+    fromEvent(document, 'didDismiss').subscribe(() => { this.card_modal = false; });
 
     this.globals.getDeviceInfo();
 
