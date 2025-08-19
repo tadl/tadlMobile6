@@ -14,18 +14,17 @@ public class MainActivity extends BridgeActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    // Follow system day/night so uiMode is correct
     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     super.onCreate(savedInstanceState);
 
-    // Inset content below system bars (no overlay)
+    // Inset content below system bars; native owns bar color & icons
     WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
     applyStatusBarAppearance();
   }
 
   @Override
-  public void onResume() {   // <-- must be public
+  public void onResume() {
     super.onResume();
     applyStatusBarAppearance();
   }
@@ -36,6 +35,12 @@ public class MainActivity extends BridgeActivity {
     applyStatusBarAppearance();
   }
 
+  @Override
+  public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) applyStatusBarAppearance();
+  }
+
   private boolean isNight() {
     int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
     return mode == Configuration.UI_MODE_NIGHT_YES;
@@ -43,14 +48,13 @@ public class MainActivity extends BridgeActivity {
 
   private void applyStatusBarAppearance() {
     final boolean night = isNight();
+    final int lightColor = Color.WHITE;
+    final int darkColor  = Color.parseColor("#121212");
 
-    // Background color
-    final int lightColor = Color.WHITE;                // light mode bar
-    final int darkColor  = Color.parseColor("#121212"); // dark mode bar
-
+    // Background
     getWindow().setStatusBarColor(night ? darkColor : lightColor);
 
-    // Icon/text contrast (Compat API works on API 21–35)
+    // Icons/text contrast (Compat works on API 21–35)
     WindowInsetsControllerCompat controller =
         new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
     controller.setAppearanceLightStatusBars(!night); // dark icons in light mode; light icons in dark mode
