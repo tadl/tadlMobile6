@@ -1,13 +1,12 @@
 package org.TADL.TADLMobile;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
-import android.view.WindowManager;
 
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -16,46 +15,19 @@ public class MainActivity extends BridgeActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+    // Let content extend to the edges; we will add exact insets as padding on the WebView.
+    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
-    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-    if (Build.VERSION.SDK_INT >= 21) {
-      getWindow().setStatusBarColor(0xFF000000);
-    }
-
-    hideStatusBar();
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-    hideStatusBar();
-  }
-
-  @Override
-  public void onWindowFocusChanged(boolean hasFocus) {
-    super.onWindowFocusChanged(hasFocus);
-    if (hasFocus) {
-      hideStatusBar();
-    }
-  }
-
-  private void hideStatusBar() {
-    if (Build.VERSION.SDK_INT >= 30) {
-      final WindowInsetsController controller = getWindow().getInsetsController();
-      if (controller != null) {
-        controller.setSystemBarsBehavior(
-            WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        );
-        controller.hide(WindowInsets.Type.statusBars());
-      }
-    } else {
-      final View decor = getWindow().getDecorView();
-      int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-      decor.setSystemUiVisibility(flags);
+    final View webView = getBridge() != null ? getBridge().getWebView() : null;
+    if (webView != null) {
+      ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {
+        Insets status = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+        Insets nav    = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+        // Top padding = status bar/cutout height; bottom padding = nav bar height
+        v.setPadding(v.getPaddingLeft(), status.top, v.getPaddingRight(), nav.bottom);
+        return insets; // don't consume; let child views handle if they want
+      });
+      ViewCompat.requestApplyInsets(webView);
     }
   }
 }

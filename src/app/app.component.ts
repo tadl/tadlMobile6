@@ -58,23 +58,20 @@ export class AppComponent {
     this.events.publish('storage_setup_complete');
   }
 
-  /**
-   * Android: hide the status bar so content never sits underneath (Pixel 9 fix).
-   * iOS: keep the bar visible and styled.
-   */
   private async configureChrome() {
     try {
-      // Ensure WebView is not laid out under system bars
-      await EdgeToEdge.disable();
-
       if (this.platform.is('android')) {
-        await StatusBar.hide();
+        await StatusBar.setOverlaysWebView({ overlay: false });
+        await StatusBar.show(); // ensure status bar is visible
+        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
       } else {
+        // iOS
         const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
       }
     } catch (e) {
-      console.log('StatusBar/EdgeToEdge configuration skipped:', e);
+      console.log('StatusBar configuration skipped:', e);
     }
   }
 
