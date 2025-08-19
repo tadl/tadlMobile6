@@ -15,19 +15,25 @@ public class MainActivity extends BridgeActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // Let content extend to the edges; we will add exact insets as padding on the WebView.
     WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
-    final View webView = getBridge() != null ? getBridge().getWebView() : null;
-    if (webView != null) {
-      ViewCompat.setOnApplyWindowInsetsListener(webView, (v, insets) -> {
-        Insets status = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-        Insets nav    = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
-        // Top padding = status bar/cutout height; bottom padding = nav bar height
-        v.setPadding(v.getPaddingLeft(), status.top, v.getPaddingRight(), nav.bottom);
-        return insets; // don't consume; let child views handle if they want
+    final View content = findViewById(android.R.id.content);
+    if (content != null) {
+      ViewCompat.setOnApplyWindowInsetsListener(content, (v, insets) -> {
+        Insets topInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+        Insets bottomInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+
+        v.setPadding(
+            v.getPaddingLeft(),
+            topInsets.top,
+            v.getPaddingRight(),
+            bottomInsets.bottom
+        );
+
+        return insets;
       });
-      ViewCompat.requestApplyInsets(webView);
+
+      ViewCompat.requestApplyInsets(content);
     }
   }
 }
