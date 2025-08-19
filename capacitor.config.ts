@@ -6,9 +6,6 @@ const config: CapacitorConfig = {
   webDir: 'www',
   bundledWebRuntime: false,
   plugins: {
-    EdgeToEdge: {
-      backgroundColor: '#ffffff' // match your header color
-    },
     Keyboard: {
       resize: 'body',
       resizeOnFullScreen: false
