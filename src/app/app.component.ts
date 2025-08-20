@@ -8,6 +8,7 @@ import { Events } from './services/event.service';
 import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
 @Component({
@@ -58,12 +59,18 @@ export class AppComponent {
 
   private async configureChrome() {
     try {
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
       if (this.platform.is('android')) {
-        return;
-      } else {
-        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // Let the Capawesome plugin handle insets; we only set colors/icons.
+        await EdgeToEdge.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
         await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
+        // DO NOT call setOverlaysWebView/show/hide/setBackgroundColor on Android.
+        return;
       }
+
+      // iOS: set icon style only
+      await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
     } catch (e) {
       console.log('StatusBar configuration skipped:', e);
     }
