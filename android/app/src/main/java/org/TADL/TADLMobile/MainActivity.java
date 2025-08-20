@@ -1,8 +1,6 @@
 package org.TADL.TADLMobile;
 
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.WindowManager;
 
@@ -19,32 +17,32 @@ public class MainActivity extends BridgeActivity {
     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     super.onCreate(savedInstanceState);
 
-    // Do NOT draw behind system bars; let Android inset content
+    // Do NOT draw behind the system bars (no overlay)
     WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
-    // Ensure system draws the bar and it’s not translucent
+    // Make sure system draws an opaque status bar we can color via the theme
     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-    applyStatusBarAppearance();
+    applyStatusBarIcons();
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    applyStatusBarAppearance();
+    applyStatusBarIcons();
   }
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    applyStatusBarAppearance();
+    applyStatusBarIcons();
   }
 
   @Override
   public void onWindowFocusChanged(boolean hasFocus) {
     super.onWindowFocusChanged(hasFocus);
-    if (hasFocus) applyStatusBarAppearance();
+    if (hasFocus) applyStatusBarIcons();
   }
 
   private boolean isNight() {
@@ -52,20 +50,12 @@ public class MainActivity extends BridgeActivity {
     return mode == Configuration.UI_MODE_NIGHT_YES;
   }
 
-  private void applyStatusBarAppearance() {
+  private void applyStatusBarIcons() {
+    // Theme provides background color. We provide icon contrast only.
     final boolean night = isNight();
-    final int lightBg = Color.WHITE;
-    final int darkBg  = Color.parseColor("#121212");
-
-    // Paint the WINDOW background that sits behind the bar (fixes white strip on Pixel 9 dark)
-    getWindow().setBackgroundDrawable(new ColorDrawable(night ? darkBg : lightBg));
-
-    // Icon/text contrast (Compat works API 21–35)
     WindowInsetsControllerCompat controller =
         new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
-    controller.setAppearanceLightStatusBars(!night); // dark icons in light mode; light in dark
-
-    // Solid bar color when not edge-to-edge; harmless if the bar is transparent on newer APIs
-    getWindow().setStatusBarColor(night ? darkBg : lightBg);
+    // true => dark icons (for light background); false => light icons (for dark background)
+    controller.setAppearanceLightStatusBars(!night);
   }
 }

@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
-  </style>
-
-  <!-- Light mode -->
+  <!-- Dark mode -->
   <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
 
-    <!-- Keep status bar opaque; system draws a real bar -->
     <item name="android:windowTranslucentStatus">false</item>
     <item name="android:windowDrawsSystemBarBackgrounds">true</item>
 
-    <!-- Background under the status bar in LIGHT mode -->
-    <item name="android:statusBarColor">@android:color/white</item>
+    <!-- Background under the status bar in DARK mode -->
+    <item name="android:statusBarColor">#121212</item>
 
-    <!-- Avoid using the cutout area -->
     <item name="android:windowLayoutInDisplayCutoutMode">never</item>
   </style>
 

@@ -60,7 +60,6 @@ export class AppComponent {
   private async configureChrome() {
     try {
       if (this.platform.is('android')) {
-        // try { await EdgeToEdge.disable(); } catch {}
         return;
       } else {
         const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
