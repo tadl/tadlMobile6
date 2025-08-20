@@ -9,7 +9,6 @@ import { Platform } from '@ionic/angular';
 import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 
 @Component({
   selector: 'app-root',
