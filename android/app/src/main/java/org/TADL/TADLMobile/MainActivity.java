@@ -2,14 +2,12 @@ package org.TADL.TADLMobile;
 
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.View;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.getcapacitor.BridgeActivity;
@@ -24,29 +22,9 @@ public class MainActivity extends BridgeActivity {
     // Do NOT draw behind system bars; let Android inset content
     WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
-    // Clear any lingering layout flags (prevents accidental fullscreen/overlay)
-    getWindow().getDecorView().setSystemUiVisibility(0);
-
-    // Extra guard: ensure the root content gets at least status-bar padding
-    final View root = findViewById(android.R.id.content);
-    if (root != null) {
-      ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
-        Insets sb = insets.getInsets(WindowInsetsCompat.Type.statusBars());
-        int wantTop = sb.top;
-        int haveTop = v.getPaddingTop();
-        // Only increase padding if it's less than the inset (avoid double padding)
-        if (haveTop < wantTop) {
-          v.setPadding(v.getPaddingLeft(), wantTop, v.getPaddingRight(), v.getPaddingBottom());
-        }
-        return insets; // don't consume; let children handle if desired
-      });
-      ViewCompat.requestApplyInsets(root);
-    }
-
-    // Also ensure the WebView itself participates in insets
-    if (getBridge() != null && getBridge().getWebView() != null) {
-      getBridge().getWebView().setFitsSystemWindows(true);
-    }
+    // Ensure system draws the bar and it’s not translucent
+    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
     applyStatusBarAppearance();
   }
@@ -76,13 +54,18 @@ public class MainActivity extends BridgeActivity {
 
   private void applyStatusBarAppearance() {
     final boolean night = isNight();
+    final int lightBg = Color.WHITE;
+    final int darkBg  = Color.parseColor("#121212");
+
+    // Paint the WINDOW background that sits behind the bar (fixes white strip on Pixel 9 dark)
+    getWindow().setBackgroundDrawable(new ColorDrawable(night ? darkBg : lightBg));
 
     // Icon/text contrast (Compat works API 21–35)
     WindowInsetsControllerCompat controller =
         new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
     controller.setAppearanceLightStatusBars(!night); // dark icons in light mode; light in dark
 
-    // Solid bar color (since we're not drawing edge-to-edge)
-    getWindow().setStatusBarColor(night ? Color.parseColor("#121212") : Color.WHITE);
+    // Solid bar color when not edge-to-edge; harmless if the bar is transparent on newer APIs
+    getWindow().setStatusBarColor(night ? darkBg : lightBg);
   }
 }
