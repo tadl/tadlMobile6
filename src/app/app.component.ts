@@ -62,14 +62,13 @@ export class AppComponent {
       const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
       if (this.platform.is('android')) {
-        // Let the Capawesome plugin handle insets; we only set colors/icons.
+        // Android: Capawesome handles padding; we set background color only.
         await EdgeToEdge.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
-        await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
-        // DO NOT call setOverlaysWebView/show/hide/setBackgroundColor on Android.
+        // Do NOT set icon style on Android; MainActivity handles it natively.
         return;
       }
 
-      // iOS: set icon style only
+      // iOS: set icon style normally
       await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
     } catch (e) {
       console.log('StatusBar configuration skipped:', e);
