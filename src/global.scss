@@ -1,36 +1,24 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
-
-/* Core CSS required for Ionic components to work properly */
+/* Core Ionic CSS */
 @import "~@ionic/angular/css/core.css";
 
-/* Basic CSS for apps built with Ionic */
+/* Basic */
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
 @import "~@ionic/angular/css/typography.css";
-@import '~@ionic/angular/css/display.css';
+@import "~@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
+/* Optional utilities */
 @import "~@ionic/angular/css/padding.css";
 @import "~@ionic/angular/css/float-elements.css";
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-ion-popover [popover]:not(:popover-open):not(dialog[open]) {
-    display: contents;
+/* Popover fix you already had */
+ion-popover [popover]:not(:popover-open):not(dialog[open]) { display: contents; }
+
+/* Keep toolbar compact on iOS without messing with safe-area math */
+:root.ios ion-toolbar,
+:root.ios ion-header {
+  --min-height: 44px;
 }
-
-:root.ios ion-header,
-:root.ios ion-toolbar { padding-top: var(--ion-safe-area-top, 0); }
-
-:root.ios ion-content,
-:root.ios ion-menu ion-content { --padding-top: var(--ion-safe-area-top, 0); }

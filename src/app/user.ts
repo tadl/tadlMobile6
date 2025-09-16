@@ -1,20 +1,19 @@
 import { Globals } from './globals';
 import { Component, ViewChild, NgZone, Injectable } from '@angular/core';
-import { ModalController, ActionSheetController, AlertController, NavController} from '@ionic/angular';
+import { ModalController, ActionSheetController, AlertController, NavController } from '@ionic/angular';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { format, formatDistance, parseISO, isSameDay, isBefore, isAfter } from 'date-fns';
 import { Md5 } from 'ts-md5';
-import { Storage } from '@ionic/storage-angular';
 import { Events } from './services/event.service';
 import { ToastService } from './services/toast.service';
 import { Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 
 @Injectable({ providedIn: 'root' })
-
 export class User {
   username: string;
-  password: any = ''
-  hashed_password: any = ''
+  password: any = '';
+  hashed_password: any = '';
   logged_in: boolean = false;
   full_name: string = '';
   ils_username: string;
@@ -50,32 +49,46 @@ export class User {
     public toast: ToastService,
     private http: HttpClient,
     private zone: NgZone,
-    private storage: Storage,
     private router: Router,
-  ){ }
+  ) {}
+
+  // ---- Preferences helpers ----
+  private async prefGet(key: string): Promise<string | null> {
+    const { value } = await Preferences.get({ key });
+    return value ?? null;
+  }
+  private async prefSet(key: string, value: string): Promise<void> {
+    await Preferences.set({ key, value });
+  }
+  private async prefRemove(key: string): Promise<void> {
+    await Preferences.remove({ key });
+  }
 
   async login(saved: boolean = false) {
-    if (saved != true) {
+    if (saved !== true) {
       if (!this.username || !this.password) {
-        this.show_error_message("Username and password are required.");
+        this.show_error_message('Username and password are required.');
         return;
       }
       this.hashed_password = Md5.hashStr(this.password);
     }
-    let params = new HttpParams()
-    .set("username", this.username)
-    .set("md5password", this.hashed_password)
-    .set("full", "true")
-    .set("v", "5");
+
+    const params = new HttpParams()
+      .set('username', this.username)
+      .set('md5password', this.hashed_password)
+      .set('full', 'true')
+      .set('v', '5');
+
     this.globals.loading_show();
-    this.http.get(this.globals.catalog_login_url, {params: params})
+    this.http.get(this.globals.catalog_login_url, { params })
       .subscribe({
         next: (response) => this.load_user_data(response),
-        error: (error) => this.show_error_message("Could not reach login server. Please verify you have a data connection or try again later."),
+        error: () =>
+          this.show_error_message('Could not reach login server. Please verify you have a data connection or try again later.'),
       });
   }
 
-  login_as(id:string) {
+  login_as(id: string) {
     this.username = this.stored_accounts[id]['username'];
     this.hashed_password = this.stored_accounts[id]['hashed_password'];
     this.login(true);
@@ -87,23 +100,24 @@ export class User {
   }
 
   async update_stored_accounts() {
-    await this.storage.get('stored_accounts').then((data:any) => {
-      this.stored_accounts = JSON.parse(data);
-      if(this.stored_accounts){
-        this.stored_accounts_keys = Object.keys(this.stored_accounts); 
-      }else{
-        this.stored_accounts = {}
-      }
-    });
+    // Load current map
+    let raw = await this.prefGet('stored_accounts');
+    try {
+      this.stored_accounts = raw ? JSON.parse(raw) : {};
+    } catch {
+      this.stored_accounts = {};
+    }
+    this.stored_accounts_keys = Object.keys(this.stored_accounts);
+
+    // Upsert current user
     if (this.id) {
-      let user = {
+      const user = {
         hashed_password: this.hashed_password,
         username: this.username,
         full_name: this.full_name,
       };
-      
       this.stored_accounts[this.id] = user;
-      this.storage.set('stored_accounts', JSON.stringify(this.stored_accounts));
+      await this.prefSet('stored_accounts', JSON.stringify(this.stored_accounts));
       this.stored_accounts_keys = Object.keys(this.stored_accounts);
     }
   }
@@ -113,15 +127,15 @@ export class User {
     this.globals.api_loading = false;
   }
 
-  async load_user_data(data: any={}) {
+  async load_user_data(data: any = {}) {
     if (data.error) {
-      this.show_error_message("Invalid username and/or password. Please try again.");
+      this.show_error_message('Invalid username and/or password. Please try again.');
     } else {
       await this.update_user_object(data);
-      this.update_stored_accounts();
+      await this.update_stored_accounts();
       this.process_checkouts(data);
       this.process_holds(data);
-      if (this.password.length == 4) {
+      if (this.password.length === 4) {
         this.update_password();
       }
     }
@@ -129,14 +143,15 @@ export class User {
   }
 
   async update_user_object(data: any = {}) {
-    //not all API calls return the full user so check to see and if not fetch the user
+    // Not all API calls return the full user; if missing, re-login with saved creds.
     if (data['user']['checkouts'] == null) {
       this.login(true);
       return;
     }
+
     this.token = data['user']['token'];
     this.full_name = data['user']['full_name'];
-    if(data['preferences']){
+    if (data['preferences']) {
       this.preferences = data['preferences'];
     }
     this.checkout_count = data['user']['checkouts'];
@@ -144,14 +159,19 @@ export class User {
     this.holds_ready_count = data['user']['holds_ready'];
     this.fines_amount = data['user']['fine'];
     this.id = data['user']['melcat_id'];
-    if (parseFloat(this.fines_amount) != parseFloat('0.00')) { this.fines_exist = true; }
+    if (parseFloat(this.fines_amount) !== parseFloat('0.00')) {
+      this.fines_exist = true;
+    }
     this.card = data['user']['card'];
     this.overdue = data['user']['overdue'];
     this.default_pickup = data['user']['pickup_library'];
-    this.storage.set('username', this.username);
-    this.storage.set('hashed_password', this.hashed_password);
+
+    // Persist primary creds for auto-login
+    await this.prefSet('username', this.username ?? '');
+    await this.prefSet('hashed_password', this.hashed_password ?? '');
+
     this.globals.api_loading = false;
-    if (this.logged_in == false) {
+    if (this.logged_in === false) {
       this.logged_in = true;
       this.events.publish('logged in');
     }
@@ -160,66 +180,65 @@ export class User {
   async confirm_logout() {
     const actionSheet = await this.actionSheetController.create({
       header: "Please confirm you'd like to log out.",
-      buttons: [{
-        text: 'Log Out',
-        role: 'destructive',
-        handler: () => {
-          this.logout(false);
-        }
-      }, {
-        text: 'Cancel',
-        role: 'cancel',
-        handler: () => {
-        }
-      }]
+      buttons: [
+        {
+          text: 'Log Out',
+          role: 'destructive',
+          handler: () => {
+            this.logout(false);
+          },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+      ],
     });
     await actionSheet.present();
   }
 
-  logout(token_only?:boolean) {
-    let params = new HttpParams()
-    .set("token", this.token)
-    .set("v", "5");
-    this.http.get(this.globals.catalog_logout_url, {params: params})
-    .subscribe((data:any) => {
-      this.globals.api_loading = false;
-      if (data['success'] || data['error'] == "not logged in or invalid token") {
-        if (token_only == false) {
-          if(this.stored_accounts){
-            delete this.stored_accounts[this.id];
-            this.stored_accounts_keys = Object.keys(this.stored_accounts);
-            this.storage.set('stored_accounts', JSON.stringify(this.stored_accounts));
+  logout(token_only?: boolean) {
+    const params = new HttpParams().set('token', this.token).set('v', '5');
+    this.http.get(this.globals.catalog_logout_url, { params }).subscribe(
+      async (data: any) => {
+        this.globals.api_loading = false;
+        if (data['success'] || data['error'] === 'not logged in or invalid token') {
+          if (token_only === false) {
+            if (this.stored_accounts) {
+              delete this.stored_accounts[this.id];
+              this.stored_accounts_keys = Object.keys(this.stored_accounts);
+              await this.prefSet('stored_accounts', JSON.stringify(this.stored_accounts));
+            }
           }
-        } else {}
-        this.zone.run(() => {
-          this.clear_user();
-          this.router.navigate(['/home']);
-        });
+          this.zone.run(() => {
+            this.clear_user();
+            this.router.navigate(['/home']);
+          });
+        }
+      },
+      () => {
+        this.toast.presentToast(this.globals.server_error_msg);
       }
-    },
-    (err) => {
-      this.toast.presentToast(this.globals.server_error_msg);
-    });
+    );
   }
 
   autolog() {
-    const subscription = this.events.subscribe('storage_setup_complete', () => {
-      this.storage.get('username').then((val: string) => {
-        if (val) {
-          this.username = val;
-          this.storage.get('hashed_password').then((val: string) => {
-            this.hashed_password = val;
-            this.login(true);
-          });
-        } else {
-          this.username = '';
-        }
-      });
+    // You already publish 'storage_setup_complete' after migration in app.component.ts
+    const subscription = this.events.subscribe('storage_setup_complete', async () => {
+      const uname = await this.prefGet('username');
+      if (uname) {
+        this.username = uname;
+        const hpw = await this.prefGet('hashed_password');
+        this.hashed_password = hpw || '';
+        this.login(true);
+      } else {
+        this.username = '';
+      }
       subscription.unsubscribe();
     });
   }
 
-  clear_user(data : any={}) {
+  clear_user(data: any = {}) {
     this.logged_in = false;
     this.username = '';
     this.password = '';
@@ -238,64 +257,63 @@ export class User {
     this.preferences = {};
     this.fines = [];
     this.checkouts = [];
-    this.holds = []
-    this.checkouts = []
-    this.storage.remove('hashed_password');
-    this.storage.remove('username');
+    this.holds = [];
+    this.checkouts = [];
+
+    // Remove persisted primary creds
+    this.prefRemove('hashed_password');
+    this.prefRemove('username');
   }
 
   get_checkouts() {
     if (this.logged_in) {
-      let params = new HttpParams()
-      .set("token", this.token)
-      .set("v", "5");
+      const params = new HttpParams().set('token', this.token).set('v', '5');
       this.globals.loading_show();
-      this.http.get(this.globals.catalog_checkouts_url, {params: params})
-      .subscribe((data:any) => {
-        this.process_checkouts(data);
-      }, (err) => {
-        this.globals.api_loading = false;
-        if (this.action_retry == true) {
-          this.toast.presentToast(this.globals.server_error_msg);
-          this.action_retry = false;
-        } else {
-          this.action_retry = true;
-          const subscription = this.events.subscribe('action_retry', () => {
-            this.get_checkouts();
-            subscription.unsubscribe();
-          });
-          this.login(true);
+      this.http.get(this.globals.catalog_checkouts_url, { params }).subscribe(
+        (data: any) => {
+          this.process_checkouts(data);
+        },
+        () => {
+          this.globals.api_loading = false;
+          if (this.action_retry === true) {
+            this.toast.presentToast(this.globals.server_error_msg);
+            this.action_retry = false;
+          } else {
+            this.action_retry = true;
+            const subscription = this.events.subscribe('action_retry', () => {
+              this.get_checkouts();
+              subscription.unsubscribe();
+            });
+            this.login(true);
+          }
         }
-      });
+      );
     }
   }
 
   renew(cid = '') {
-    let url = this.globals.catalog_renew_url;
-    let params = new HttpParams()
-      .set("token", this.token)
-      .set("checkout_ids", cid)
-      .set("v", "5");
+    const url = this.globals.catalog_renew_url;
+    const params = new HttpParams().set('token', this.token).set('checkout_ids', cid).set('v', '5');
     this.globals.loading_show();
-    this.http.get(url, {params: params})
-      .subscribe((data: any) => {
+    this.http.get(url, { params }).subscribe(
+      (data: any) => {
         this.globals.api_loading = false;
-        if (data['errors'].length == 0 && data['checkouts'] && data['user']) {
+        if (data['errors'].length === 0 && data['checkouts'] && data['user']) {
           this.process_checkouts(data);
           this.toast.presentToast(data['message']);
         } else if (data['checkouts'] && data['user']) {
           this.process_checkouts(data);
           let message = data['message'] + ': ';
-          data['errors'].forEach(function(val: any) {
+          data['errors'].forEach(function (val: any) {
             message += val['title'] + ': ' + val['message'];
           });
           this.toast.presentToast(message);
         }
         this.events.publish('renew_attempt_complete');
       },
-      (err) => {
+      () => {
         this.globals.api_loading = false;
-        if (this.action_retry == true) {
+        if (this.action_retry === true) {
           this.toast.presentToast(this.globals.server_error_msg);
           this.action_retry = false;
         } else {
@@ -306,28 +324,33 @@ export class User {
           });
           this.login(true);
         }
-      });
+      }
+    );
   }
 
   async renew_all() {
     const actionSheet = await this.actionSheetController.create({
-      header: "Attempt to renew all items?",
-      buttons: [{
-        text: 'Renew All',
-        handler: () => {
-          let to_renew = this.checkouts.filter(item => item['renew_attempts'] > 0).map(item => item['checkout_id']).join();
-          if (to_renew.length > 0) {
-            this.renew(to_renew);
-          } else {
-            this.toast.presentToast("No items eligible for renewal.", 5000);
-          }
-        }
-      }, {
-        text: 'Cancel',
-        role: 'cancel',
-        handler: () => {
-        }
-      }]
+      header: 'Attempt to renew all items?',
+      buttons: [
+        {
+          text: 'Renew All',
+          handler: () => {
+            const to_renew = this.checkouts
+              .filter((item) => item['renew_attempts'] > 0)
+              .map((item) => item['checkout_id'])
+              .join();
+            if (to_renew.length > 0) {
+              this.renew(to_renew);
+            } else {
+              this.toast.presentToast('No items eligible for renewal.', 5000);
+            }
+          },
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+      ],
     });
     await actionSheet.present();
   }
@@ -335,37 +358,57 @@ export class User {
   get_holds() {
     if (this.logged_in) {
       this.globals.loading_show();
-      let params = new HttpParams()
-      .set("token", this.token)
-      .set("v", "5");
+      const params = new HttpParams().set('token', this.token).set('v', '5');
       this.globals.loading_show();
-      this.http.get(this.globals.catalog_holds_url, {params: params})
-      .subscribe((data:any) => {
-        this.process_holds(data);
-      }, (err) => {
-        this.globals.api_loading = false;
-        if (this.action_retry == true) {
-          this.toast.presentToast(this.globals.server_error_msg);
-          this.action_retry = false;
-        } else {
-          this.action_retry = true;
-          const subscription = this.events.subscribe('action_retry', () => {
-            this.get_holds();
-            subscription.unsubscribe();
-          });
-          this.login(true);
+      this.http.get(this.globals.catalog_holds_url, { params }).subscribe(
+        (data: any) => {
+          this.process_holds(data);
+        },
+        () => {
+          this.globals.api_loading = false;
+          if (this.action_retry === true) {
+            this.toast.presentToast(this.globals.server_error_msg);
+            this.action_retry = false;
+          } else {
+            this.action_retry = true;
+            const subscription = this.events.subscribe('action_retry', () => {
+              this.get_holds();
+              subscription.unsubscribe();
+            });
+            this.login(true);
+          }
         }
-      });
+      );
     }
   }
 
   process_holds(data: any) {
     this.globals.api_loading = false;
-    this.update_user_object(data)
-    data = data['holds']
-    let existing = this.holds.map(item => item['hold_id'] + item['hold_status'] + item['queue_status'] + item['queue_state'][0] + item['queue_state'][1] + item['pickup_location_code']).join();
-    let newdata = data.map((item: any) => item['hold_id'] + item['hold_status'] + item['queue_status'] + item['queue_state'][0] + item['queue_state'][1] + item['pickup_location_code']).join();
-    if (existing != newdata) {
+    this.update_user_object(data);
+    data = data['holds'];
+    const existing = this.holds
+      .map(
+        (item) =>
+          item['hold_id'] +
+          item['hold_status'] +
+          item['queue_status'] +
+          item['queue_state'][0] +
+          item['queue_state'][1] +
+          item['pickup_location_code']
+      )
+      .join();
+    const newdata = data
+      .map(
+        (item: any) =>
+          item['hold_id'] +
+          item['hold_status'] +
+          item['queue_status'] +
+          item['queue_state'][0] +
+          item['queue_state'][1] +
+          item['pickup_location_code']
+      )
+      .join();
+    if (existing !== newdata) {
       this.zone.run(() => {
         this.holds = data;
       });
@@ -374,7 +417,7 @@ export class User {
   }
 
   async login_and_place_hold(id: string) {
-    const onClosedData: string = "Wrapped up!";
+    const onClosedData: string = 'Wrapped up!';
     await this.modalController.dismiss(onClosedData);
     this.globals.open_account_menu();
     const subscription = this.events.subscribe('logged in', () => {
@@ -384,43 +427,43 @@ export class User {
   }
 
   place_hold(id: string, force: string) {
-    var params = new HttpParams()
-      .set("token", this.token)
-      .set("id", id)
-      .set("v", "5");
-    if (force == 'true') { params = params.append("force", "true"); }
-    let url = this.globals.catalog_place_hold_url;
+    let params = new HttpParams().set('token', this.token).set('id', id).set('v', '5');
+    if (force === 'true') {
+      params = params.append('force', 'true');
+    }
+    const url = this.globals.catalog_place_hold_url;
     this.globals.loading_show();
-    this.http.get(url, {params: params})
-      .subscribe((data: any) => {
+    this.http.get(url, { params }).subscribe(
+      (data: any) => {
         this.globals.api_loading = false;
         if (data['user'] && data['hold']) {
-          if (data['hold']['need_to_force'] == true) {
+          if (data['hold']['need_to_force'] === true) {
             this.force_needed(data['hold']['id'], data['hold']['error']);
           } else if (data['hold']['error']) {
             this.toast.presentToast(data['hold']['error'] + ' : ' + data['hold']['confirmation']);
           } else {
             this.toast.presentToast(data['hold']['confirmation'], 5000);
             this.update_user_object(data);
-            this.events.publish('hold_placed')
+            this.events.publish('hold_placed');
           }
         }
-        this.get_holds()
+        this.get_holds();
       },
-      (err) => {
-        if (this.action_retry == true) {
+      () => {
+        if (this.action_retry === true) {
           this.globals.api_loading = false;
           this.toast.presentToast(this.globals.server_error_msg);
         } else {
           this.globals.api_loading = false;
           this.action_retry = true;
-          let subscription = this.events.subscribe('action_retry', () => {
+          const subscription = this.events.subscribe('action_retry', () => {
             this.place_hold(id, force);
             subscription.unsubscribe();
           });
           this.login(true);
         }
-      });
+      }
+    );
   }
 
   async force_needed(id: string, error: string) {
@@ -431,129 +474,139 @@ export class User {
         {
           text: 'Cancel',
           role: 'cancel',
-        }, {
+        },
+        {
           text: 'Force Hold',
           handler: () => {
-            this.place_hold(id, "true");
-          }
-        }
-      ]
+            this.place_hold(id, 'true');
+          },
+        },
+      ],
     });
     await alert.present();
   }
 
   manage_hold(hold: any, task: string) {
-    let url = this.globals.catalog_holds_manage_url;
-    let params = new HttpParams()
-      .set("token", this.token)
-      .set("hold_id", hold.hold_id)
-      .set("task", task)
-      .set("v", "5");
-    if (task == "activate") { var action = "activated"; }
-    else if (task == "suspend") { var action = "suspended"; }
-    else if (task == "cancel") { var action = "canceled"; }
+    const url = this.globals.catalog_holds_manage_url;
+    const params = new HttpParams()
+      .set('token', this.token)
+      .set('hold_id', hold.hold_id)
+      .set('task', task)
+      .set('v', '5');
+    let action: string;
+    if (task === 'activate') action = 'activated';
+    else if (task === 'suspend') action = 'suspended';
+    else action = 'canceled';
+
     this.globals.loading_show();
-    this.http.get(url, {params: params})
-      .subscribe((data: any) => {
+    this.http.get(url, { params }).subscribe(
+      (data: any) => {
         this.globals.api_loading = false;
         if (data['holds'] && data['user']) {
           this.process_holds(data);
           this.update_user_object(data);
-          this.toast.presentToast("Successfully " + action + " hold on " + hold.title_display + ".", 5000);
+          this.toast.presentToast(`Successfully ${action} hold on ${hold.title_display}.`, 5000);
         }
         this.events.publish('manage_hold_complete');
       },
-      (err) => {
+      () => {
         this.globals.api_loading = false;
-        if (this.action_retry == true) {
+        if (this.action_retry === true) {
           this.toast.presentToast(this.globals.server_error_msg);
           this.action_retry = false;
         } else {
           this.action_retry = true;
-          let subscription = this.events.subscribe('action_retry', () => {
+          const subscription = this.events.subscribe('action_retry', () => {
             this.manage_hold(hold, task);
             subscription.unsubscribe();
           });
           this.login(true);
         }
-      });
+      }
+    );
   }
 
   async cancel_hold(hold: any) {
     const actionSheet = await this.actionSheetController.create({
       header: 'Cancel hold on ' + hold.title_display,
-      buttons: [{
-        text: 'Cancel Hold',
-        role: 'destructive',
-        handler: () => {
-          this.manage_hold(hold, 'cancel');
-        }
-      }, {
-        text: 'Nevermind',
-        role: 'cancel',
-        handler: () => {
-        }
-      }]
+      buttons: [
+        {
+          text: 'Cancel Hold',
+          role: 'destructive',
+          handler: () => {
+            this.manage_hold(hold, 'cancel');
+          },
+        },
+        {
+          text: 'Nevermind',
+          role: 'cancel',
+        },
+      ],
     });
     await actionSheet.present();
   }
 
   change_hold_pickup(hold: any, newloc: any) {
-    let url = this.globals.catalog_change_hold_pickup_url;
-    let params = new HttpParams()
-      .set("token", this.token)
-      .set("hold_id", hold.hold_id)
-      .set("hold_status", hold.hold_status)
-      .set("pickup_location", newloc.detail.value)
-      .set("v", "5");
+    const url = this.globals.catalog_change_hold_pickup_url;
+    const params = new HttpParams()
+      .set('token', this.token)
+      .set('hold_id', hold.hold_id)
+      .set('hold_status', hold.hold_status)
+      .set('pickup_location', newloc.detail.value)
+      .set('v', '5');
     this.globals.loading_show();
-    this.http.get(url, {params: params})
-      .subscribe((data: any) => {
+    this.http.get(url, { params }).subscribe(
+      (data: any) => {
         this.globals.api_loading = false;
-        if (data['hold_id'] == hold.hold_id) {
+        if (data['hold_id'] === hold.hold_id) {
           this.zone.run(() => {
-            this.holds.find(item => item['hold_id'] == data['hold_id'])['pickup_location'] = data['pickup_location'];
-            this.holds.find(item => item['hold_id'] == data['hold_id'])['pickup_location_code'] = data['pickup_location_code'];
+            this.holds.find((item) => item['hold_id'] === data['hold_id'])['pickup_location'] = data['pickup_location'];
+            this.holds.find((item) => item['hold_id'] === data['hold_id'])['pickup_location_code'] =
+              data['pickup_location_code'];
             this.toast.presentToast('Changed pickup location for ' + hold.title_display + ' to ' + data['pickup_location'], 5000);
           });
         }
       },
-      (err) => {
-        if (this.action_retry == true) {
+      () => {
+        if (this.action_retry === true) {
           this.toast.presentToast(this.globals.server_error_msg);
           this.action_retry = false;
         } else {
           this.action_retry = true;
-          let subscrition = this.events.subscribe('action_retry', () => {
+          const subscrition = this.events.subscribe('action_retry', () => {
             this.change_hold_pickup(hold, newloc);
             subscrition.unsubscribe();
           });
           this.login(true);
         }
-      });
+      }
+    );
   }
 
-  process_checkouts(data: any={}) {
+  process_checkouts(data: any = {}) {
     this.globals.api_loading = false;
-    let date_today = format(new Date(), 'MM/dd/yyyy');
-    this.update_user_object(data)
-    data = data['checkouts']
-    data.forEach(function(checkout: any={} , index = 0) {
-      if (isBefore(new Date(checkout['due_date']), new Date(date_today)) && !isSameDay(new Date(checkout['due_date']), new Date(date_today))) {
+    const date_today = format(new Date(), 'MM/dd/yyyy');
+    this.update_user_object(data);
+    data = data['checkouts'];
+    data.forEach(function (checkout: any = {}, index = 0) {
+      if (
+        isBefore(new Date(checkout['due_date']), new Date(date_today)) &&
+        !isSameDay(new Date(checkout['due_date']), new Date(date_today))
+      ) {
         data[index]['overdue'] = true;
         data[index]['due_words'] = formatDistance(new Date(checkout['due_date']), new Date(date_today)) + ' ago';
       } else {
         data[index]['overdue'] = false;
         if (isSameDay(new Date(checkout['due_date']), new Date(date_today))) {
-          data[index]['due_words'] = "today";
+          data[index]['due_words'] = 'today';
         } else {
           data[index]['due_words'] = 'in ' + formatDistance(new Date(checkout['due_date']), new Date(date_today));
         }
       }
     });
-    let existing = this.checkouts.map(item => item['checkout_id'] + item['renew_attempts'] + item['due_date']).join();
-    let newdata = data.map((item: any) => item['checkout_id'] + item['renew_attempts'] + item['due_date']).join();
-    if (existing != newdata) {
+    const existing = this.checkouts.map((item) => item['checkout_id'] + item['renew_attempts'] + item['due_date']).join();
+    const newdata = data.map((item: any) => item['checkout_id'] + item['renew_attempts'] + item['due_date']).join();
+    if (existing !== newdata) {
       this.zone.run(() => {
         this.checkouts = data;
       });
@@ -563,182 +616,190 @@ export class User {
 
   update_preferences(params: any, password: any) {
     this.globals.loading_show();
-    let url = this.globals.catalog_update_preferences_url;
-    this.http.get(url, {params: params})
-      .subscribe((data: any) => {
-        console.log(data);
+    const url = this.globals.catalog_update_preferences_url;
+    this.http.get(url, { params }).subscribe(
+      async (data: any) => {
         this.globals.api_loading = false;
-        this.update_user_object(data);
+        await this.update_user_object(data);
         this.preferences = data['preferences'];
-        if (data["messages"][0]["error"]) {
-          this.toast.presentToast(data["messages"][0]["error"],10000);
+        if (data['messages'][0]['error']) {
+          this.toast.presentToast(data['messages'][0]['error'], 10000);
         } else {
           if (password) {
             this.hashed_password = Md5.hashStr(password);
-            this.update_stored_accounts();
+            await this.update_stored_accounts();
           }
-          if ((data["messages"][0]["type"] != "circ_prefs") && (data["messages"][0]["type"] != "notify_prefs")) {
-            this.toast.presentToast(data["messages"][0]["success"],5000);
+          if (data['messages'][0]['type'] !== 'circ_prefs' && data['messages'][0]['type'] !== 'notify_prefs') {
+            this.toast.presentToast(data['messages'][0]['success'], 5000);
           }
         }
       },
-      (err) => {
+      () => {
         this.globals.api_loading = false;
-        if (this.action_retry == true) {
+        if (this.action_retry === true) {
           this.toast.presentToast(this.globals.server_error_msg);
           this.action_retry = false;
         } else {
           this.action_retry = true;
-          let subscription = this.events.subscribe('action_retry', () => {
+          const subscription = this.events.subscribe('action_retry', () => {
             this.update_preferences(params, null);
             subscription.unsubscribe();
           });
           this.login(true);
         }
-      });
+      }
+    );
   }
 
   get_preferences() {
-    let params = new HttpParams()
-      .set("token", this.token)
-      .set("v", "5");
-    let url = this.globals.catalog_preferences_url;
+    const params = new HttpParams().set('token', this.token).set('v', '5');
+    const url = this.globals.catalog_preferences_url;
     this.globals.loading_show();
-    this.http.get(url, {params: params})
-      .subscribe((data: any) => {
+    this.http.get(url, { params }).subscribe(
+      async (data: any) => {
         this.globals.api_loading = false;
         if (data) {
-          this.update_user_object(data);
+          await this.update_user_object(data);
           this.preferences = data['preferences'];
         }
       },
-      (err) => {
+      () => {
         this.globals.api_loading = false;
-        if (this.action_retry == true) {
+        if (this.action_retry === true) {
           this.toast.presentToast(this.globals.server_error_msg);
           this.action_retry = false;
         } else {
           this.action_retry = true;
-          let subscription = this.events.subscribe('action_retry', () => {
+          const subscription = this.events.subscribe('action_retry', () => {
             this.action_retry = false;
             subscription.unsubscribe();
           });
           this.login(true);
         }
-      });
+      }
+    );
   }
 
   get_fines() {
-    let params = new HttpParams()
-      .set("token", this.token)
-      .set("v", "5");
-    let url = this.globals.catalog_fines_url;
+    const params = new HttpParams().set('token', this.token).set('v', '5');
+    const url = this.globals.catalog_fines_url;
     this.globals.loading_show();
-    this.http.get(url, {params: params})
-      .subscribe((data:any) => {
+    this.http.get(url, { params }).subscribe(
+      (data: any) => {
         this.globals.api_loading = false;
         if (data) {
           this.fines = data;
         }
       },
-      (err) => {
+      () => {
         this.globals.api_loading = false;
-        if (this.action_retry == true) {
+        if (this.action_retry === true) {
           this.toast.presentToast(this.globals.server_error_msg);
           this.action_retry = false;
         } else {
           this.action_retry = true;
-          let subscription = this.events.subscribe('action_retry', () => {
+          const subscription = this.events.subscribe('action_retry', () => {
             this.get_fines();
             subscription.unsubscribe();
           });
           this.login(true);
         }
-      });
+      }
+    );
   }
 
   async update_password() {
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+[\]{};:'",.<>/?\\|]{7,}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()-_=+\[\]{};:'",.<>/?\\|]{7,}$/;
     const alert = await this.alertController.create({
       header: 'Temporary Password Detected',
-      message: 'Password update is required when logging in with a temporary password. Please enter a new password (twice) then tap Ok.',
-      inputs: [{
-        name: 'new_password1',
-        type: 'password',
-        placeholder: 'New Password',
-      }, {
-        name: 'new_password2',
-        type: 'password',
-        placeholder: 'New Password Again',
-      }],
-      buttons: [{
-        text: 'Cancel',
-        role: 'cancel',
-        cssClass: 'secondary',
-      }, {
-        text: 'Ok',
-        handler: (values) => {
-          if (values.new_password1 != values.new_password2) {
-            this.toast.presentToast("Passwords did not match, please try again.", 5000);
-          } else {
-            if (passwordRegex.test(values.new_password1)) {
-              let params = new HttpParams()
-                .set("token", this.token)
-                .set("user_prefs_changed", "true")
-                .set("password_changed", "true")
-                .set("new_password", values.new_password1)
-                .set("current_password", this.password)
-                .set("v", "5");
-              this.update_preferences(params, values.new_password1);
+      message:
+        'Password update is required when logging in with a temporary password. Please enter a new password (twice) then tap Ok.',
+      inputs: [
+        {
+          name: 'new_password1',
+          type: 'password',
+          placeholder: 'New Password',
+        },
+        {
+          name: 'new_password2',
+          type: 'password',
+          placeholder: 'New Password Again',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        },
+        {
+          text: 'Ok',
+          handler: (values) => {
+            if (values.new_password1 !== values.new_password2) {
+              this.toast.presentToast('Passwords did not match, please try again.', 5000);
             } else {
-              this.toast.presentToast("Password must be at least 7 characters in length, contain one number and one letter.", 10000);
-              this.update_password();
+              if (passwordRegex.test(values.new_password1)) {
+                const params = new HttpParams()
+                  .set('token', this.token)
+                  .set('user_prefs_changed', 'true')
+                  .set('password_changed', 'true')
+                  .set('new_password', values.new_password1)
+                  .set('current_password', this.password)
+                  .set('v', '5');
+                this.update_preferences(params, values.new_password1);
+              } else {
+                this.toast.presentToast(
+                  'Password must be at least 7 characters in length, contain one number and one letter.',
+                  10000
+                );
+                this.update_password();
+              }
             }
-          }
-        }
-      }]
+          },
+        },
+      ],
     });
     await alert.present();
   }
 
-  get_checkout_history(page?:number, more?:boolean) {
-    if (!page) { this.checkout_history_page = 0; }
-    let params = new HttpParams()
-      .set("token", this.token)
-      .set("v", "5")
-      .set("page", this.checkout_history_page);
+  get_checkout_history(page?: number, more?: boolean) {
+    if (!page) {
+      this.checkout_history_page = 0;
+    }
+    const params = new HttpParams().set('token', this.token).set('v', '5').set('page', this.checkout_history_page);
+    const url = this.globals.catalog_checkout_history_url;
     let new_items: any = [];
-    let url = this.globals.catalog_checkout_history_url;
     this.globals.loading_show();
-    this.http.get(url, {params: params}).subscribe((data:any) => {
-      this.globals.api_loading = false;
-      if (data['user'] && data['checkouts']) {
-        new_items = data['checkouts'];
-        if (data['more_results'] == "true") { this.more_checkout_history = true; } else { this.more_checkout_history = false; }
-        if (more == true) {
-          for (let i = 0; i < new_items.length; i++) {
-            this.checkout_history.push(new_items[i]);
+    this.http.get(url, { params }).subscribe(
+      (data: any) => {
+        this.globals.api_loading = false;
+        if (data['user'] && data['checkouts']) {
+          new_items = data['checkouts'];
+          this.more_checkout_history = data['more_results'] === 'true';
+          if (more === true) {
+            for (let i = 0; i < new_items.length; i++) {
+              this.checkout_history.push(new_items[i]);
+            }
+          } else {
+            this.checkout_history = new_items;
           }
+        }
+        this.events.publish('process_checkout_history_complete');
+      },
+      () => {
+        this.globals.api_loading = false;
+        if (this.action_retry === true) {
+          this.toast.presentToast(this.globals.server_error_msg);
+          this.action_retry = false;
         } else {
-          this.checkout_history = new_items;
+          this.action_retry = true;
+          const subscription = this.events.subscribe('action_retry', () => {
+            this.get_checkout_history();
+            subscription.unsubscribe();
+          });
+          this.login(true);
         }
       }
-      this.events.publish('process_checkout_history_complete');
-    },
-    (err) => {
-      this.globals.api_loading = false;
-      if (this.action_retry == true) {
-        this.toast.presentToast(this.globals.server_error_msg);
-        this.action_retry = false;
-      } else {
-        this.action_retry = true;
-        let subscription = this.events.subscribe('action_retry', () => {
-          this.get_checkout_history();
-          subscription.unsubscribe();
-        });
-        this.login(true);
-      }
-    });
+    );
   }
-
 }

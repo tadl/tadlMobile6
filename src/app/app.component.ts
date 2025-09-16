@@ -10,6 +10,7 @@ import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
 import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 import { StatusBar, Style } from '@capacitor/status-bar';
+import { migrateCredsIfNeeded } from './cred-migration';
 
 @Component({
   selector: 'app-root',
@@ -54,22 +55,23 @@ export class AppComponent {
   async setup_storage() {
     await this.storage.defineDriver(CordovaSQLiteDriver);
     await this.storage.create();
+    await migrateCredsIfNeeded(this.storage);
     this.events.publish('storage_setup_complete');
   }
 
   private async configureChrome() {
     try {
-      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
       if (this.platform.is('android')) {
-        // Android: Capawesome handles padding; we set background color only.
+        // Android untouched
+        const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         await EdgeToEdge.setBackgroundColor({ color: dark ? '#121212' : '#ffffff' });
-        // Do NOT set icon style on Android; MainActivity handles it natively.
         return;
       }
 
-      // iOS: set icon style normally
-      await StatusBar.setStyle({ style: dark ? Style.Light : Style.Dark });
+      // iOS: let the system pick the right content color for the current appearance.
+      await StatusBar.setStyle({ style: Style.Default });
+
+      // If you ever enable/disable overlay elsewhere, you can keep it as-is; we don't touch it here.
     } catch (e) {
       console.log('StatusBar configuration skipped:', e);
     }
@@ -103,6 +105,7 @@ export class AppComponent {
 
     this.globals.getDeviceInfo();
 
+    // Re-apply when the appearance toggles
     const theme = window.matchMedia('(prefers-color-scheme: dark)');
     theme.addEventListener('change', () => this.configureChrome());
   }
