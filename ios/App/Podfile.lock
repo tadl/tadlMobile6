@@ -1,0 +1,76 @@
+PODS:
+  - Capacitor (7.4.2):
+    - CapacitorCordova
+  - CapacitorApp (7.0.2):
+    - Capacitor
+  - CapacitorBrowser (7.0.2):
+    - Capacitor
+  - CapacitorCordova (7.4.2)
+  - CapacitorDevice (7.0.2):
+    - Capacitor
+  - CapacitorHaptics (7.0.2):
+    - Capacitor
+  - CapacitorKeyboard (7.0.2):
+    - Capacitor
+  - CapacitorNetwork (7.0.2):
+    - Capacitor
+  - CapacitorPreferences (7.0.2):
+    - Capacitor
+  - CapacitorStatusBar (7.0.2):
+    - Capacitor
+  - CordovaPlugins (7.4.2):
+    - CapacitorCordova
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
+  - "CapacitorBrowser (from `../../node_modules/@capacitor/browser`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorDevice (from `../../node_modules/@capacitor/device`)"
+  - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
+  - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
+  - "CapacitorNetwork (from `../../node_modules/@capacitor/network`)"
+  - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
+  - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - CordovaPlugins (from `../capacitor-cordova-ios-plugins`)
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorApp:
+    :path: "../../node_modules/@capacitor/app"
+  CapacitorBrowser:
+    :path: "../../node_modules/@capacitor/browser"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorDevice:
+    :path: "../../node_modules/@capacitor/device"
+  CapacitorHaptics:
+    :path: "../../node_modules/@capacitor/haptics"
+  CapacitorKeyboard:
+    :path: "../../node_modules/@capacitor/keyboard"
+  CapacitorNetwork:
+    :path: "../../node_modules/@capacitor/network"
+  CapacitorPreferences:
+    :path: "../../node_modules/@capacitor/preferences"
+  CapacitorStatusBar:
+    :path: "../../node_modules/@capacitor/status-bar"
+  CordovaPlugins:
+    :path: "../capacitor-cordova-ios-plugins"
+
+SPEC CHECKSUMS:
+  Capacitor: 156d98aba46ec01dde72c4bbb92fa626837cad29
+  CapacitorApp: efc1e9748a8ea5d3e789cd82a4f451341cc7ac93
+  CapacitorBrowser: 45c681e7abc3b4384e54eb52bafeef1347d98fa8
+  CapacitorCordova: 5e58d04631bc5094894ac106e2bf1da18a9e6151
+  CapacitorDevice: a50a45f0d075e55e2392c7a4be5404d4f69515de
+  CapacitorHaptics: 09d96bcb5a2b74ede8fd039b4cdf58fc43dcacf1
+  CapacitorKeyboard: 056bbe3711830ccb782f1705a8ad183b27b6c51e
+  CapacitorNetwork: 9b9eaeb417ec0ffa22e2bc33a4c71df10e1d6f06
+  CapacitorPreferences: b583b5deb74e564c35968189d25d32c0fd41200d
+  CapacitorStatusBar: 5526833b87fa9c96a2a90c1322bb1f663c04505f
+  CordovaPlugins: ab22a3465140a15b724dc02ab8f3b4636a01fb15
+
+PODFILE CHECKSUM: a40361296fa24c73c70b3bdccf27ded1abf3d2fc
+
+COCOAPODS: 1.12.1
