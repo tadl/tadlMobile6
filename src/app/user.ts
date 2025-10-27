@@ -223,8 +223,7 @@ export class User {
   }
 
   autolog() {
-    // You already publish 'storage_setup_complete' after migration in app.component.ts
-    const subscription = this.events.subscribe('storage_setup_complete', async () => {
+    const attempt = async () => {
       const uname = await this.prefGet('username');
       if (uname) {
         this.username = uname;
@@ -234,7 +233,15 @@ export class User {
       } else {
         this.username = '';
       }
-      subscription.unsubscribe();
+    };
+
+    // Try immediately (covers the case where migration already finished)
+    attempt();
+
+    // Also try again after storage init/migration completes
+    const sub = this.events.subscribe('storage_setup_complete', async () => {
+      await attempt();
+      sub.unsubscribe();
     });
   }
 

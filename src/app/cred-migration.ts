@@ -6,16 +6,31 @@ export async function migrateCredsIfNeeded(storage: Storage) {
   const { value: done } = await Preferences.get({ key: 'creds_migrated_v1' });
   if (done === 'yes') return;
 
-  const legacy = await storage.get('stored_accounts'); // stringified JSON
-  if (legacy) {
-    await Preferences.set({ key: 'stored_accounts', value: legacy });
+  let migrated = false;
+
+  // stored_accounts (may be string or object depending on past writes)
+  const legacyAccounts = await storage.get('stored_accounts');
+  if (legacyAccounts) {
+    const value = typeof legacyAccounts === 'string' ? legacyAccounts : JSON.stringify(legacyAccounts);
+    await Preferences.set({ key: 'stored_accounts', value });
+    migrated = true;
   }
 
-  // If you also store username/hashed_password separately in Storage, migrate them too:
+  // primary creds
   const u = await storage.get('username');
-  if (u) await Preferences.set({ key: 'username', value: u });
-  const hp = await storage.get('hashed_password');
-  if (hp) await Preferences.set({ key: 'hashed_password', value: hp });
+  if (u) {
+    await Preferences.set({ key: 'username', value: String(u) });
+    migrated = true;
+  }
 
-  await Preferences.set({ key: 'creds_migrated_v1', value: 'yes' });
+  const hp = await storage.get('hashed_password');
+  if (hp) {
+    await Preferences.set({ key: 'hashed_password', value: String(hp) });
+    migrated = true;
+  }
+
+  // Only mark done if we actually moved something (harmless either way)
+  if (migrated) {
+    await Preferences.set({ key: 'creds_migrated_v1', value: 'yes' });
+  }
 }

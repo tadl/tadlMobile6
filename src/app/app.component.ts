@@ -78,6 +78,7 @@ export class AppComponent {
   }
 
   ngOnInit() {
+    this.user.autolog();
     this.setup_storage();
     this.getNetworkStatus();
     Network.addListener('networkStatusChange', () => this.getNetworkStatus());
@@ -98,8 +99,6 @@ export class AppComponent {
       if (isActive) this.configureChrome();
     });
     window.addEventListener('focus', () => this.configureChrome());
-
-    this.user.autolog();
 
     fromEvent(document, 'didDismiss').subscribe(() => { this.card_modal = false; });
 
