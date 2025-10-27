@@ -6,7 +6,6 @@ import { Network } from '@capacitor/network';
 import { fromEvent } from 'rxjs';
 import { Events } from './services/event.service';
 import { Platform } from '@ionic/angular';
-import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 import { App } from '@capacitor/app';
 import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 import { StatusBar, Style } from '@capacitor/status-bar';
@@ -53,7 +52,6 @@ export class AppComponent {
   }
 
   async setup_storage() {
-    await this.storage.defineDriver(CordovaSQLiteDriver);
     await this.storage.create();
     await migrateCredsIfNeeded(this.storage);
     this.events.publish('storage_setup_complete');

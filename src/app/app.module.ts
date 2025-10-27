@@ -11,7 +11,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { Drivers, Storage } from '@ionic/storage';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { NgxBarcode6Module } from 'ngx-barcode6';
-import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
 
 @NgModule({
   declarations: [AppComponent],
@@ -26,7 +25,7 @@ import * as CordovaSQLiteDriver from 'localforage-cordovasqlitedriver';
     NgxBarcode6Module,
     IonicStorageModule.forRoot({
       name: '__db',
-      driverOrder: [CordovaSQLiteDriver._driver, Drivers.IndexedDB]
+      driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
     }),
   ],
   providers: [

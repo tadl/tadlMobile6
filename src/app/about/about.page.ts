@@ -1,3 +1,4 @@
+// src/app/about/about.page.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 import { Platform } from '@ionic/angular';
@@ -14,7 +15,7 @@ import { Preferences } from '@capacitor/preferences';
 })
 export class AboutPage implements OnInit, OnDestroy {
 
-  platforms: string = '';
+  platforms = '';
   storage_driver: string | null = null;
   creds_migrated: 'yes' | 'no' | 'pending' = 'pending';
 
@@ -36,13 +37,12 @@ export class AboutPage implements OnInit, OnDestroy {
     const { value } = await Preferences.get({ key: 'creds_migrated_v1' });
     this.creds_migrated = value === 'yes' ? 'yes' : 'no';
 
-    // If storage was already created, this will be set; otherwise wait for the event.
-    this.storage_driver = this.storage?.driver ?? null;
+    // Initial value (before storage init event)
+    this.storage_driver = this.computeStorageDriver();
 
-    // Update once storage init (and migration) completes.
+    // Update after storage init (emitted by AppComponent)
     this.storageSub = this.events.subscribe('storage_setup_complete', () => {
-      this.storage_driver = this.storage.driver || '(unknown)';
-      // Only need this once
+      this.storage_driver = this.computeStorageDriver();
       this.storageSub?.unsubscribe();
       this.storageSub = undefined;
     });
@@ -54,4 +54,14 @@ export class AboutPage implements OnInit, OnDestroy {
 
   ionViewDidEnter() {}
   ionViewWillLeave() {}
+
+  private computeStorageDriver(): string {
+    const isNative = this.platform.is('ios') || this.platform.is('android');
+    if (isNative) return 'preferences';
+
+    const d = (this.storage?.driver ?? '').toString().toLowerCase();
+    if (d === 'indexeddb') return 'indexeddb';
+    if (d === 'localstorage') return 'localstorage';
+    return d || '(unknown)';
+  }
 }
